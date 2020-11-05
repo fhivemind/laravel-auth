@@ -15,10 +15,11 @@ use Illuminate\Http\Request;
 */
 
 /*
- * Welcome route - link to any public API documentation here
+ * Welcome route
+ * TODO: Replace this with the complete list of APIs
  */
 Route::get('/', function () {
-    echo 'Welcome to our API';
+    echo 'Jourfixer API';
 });
 
 /** @var \Dingo\Api\Routing\Router $api */
@@ -43,7 +44,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         $api->group(['prefix' => 'auth'], function (Router $api) {
             $api->group(['prefix' => 'jwt'], function (Router $api) {
                 $api->get('/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
-                $api->delete('/token', 'App\Http\Controllers\Auth\AuthController@logout');
+                $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
             });
 
             $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser');
@@ -52,7 +53,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * Users
          */
-        $api->group(['prefix' => 'users', 'middleware' => 'check_role:admin'], function (Router $api) {
+        $api->group(['prefix' => 'users'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserController@getAll');
             $api->get('/{uuid}', 'App\Http\Controllers\UserController@get');
             $api->post('/', 'App\Http\Controllers\UserController@post');
