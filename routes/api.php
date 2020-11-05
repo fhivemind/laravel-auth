@@ -68,5 +68,13 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         $api->group(['prefix' => 'roles'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\RoleController@getAll');
         });
+
+        
+        /*
+         * User Roles
+         */
+        $api->group(['prefix' => 'user_roles'], function (Router $api) {
+            $api->get('/', 'App\Http\Controllers\UserRoleController@getAll');
+        });
     });
 });

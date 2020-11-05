@@ -170,7 +170,7 @@ return [
         |
         */
 
-        'base_files' => true,
+        'base_files' => false,
 
         /*
         |--------------------------------------------------------------------------
@@ -265,6 +265,8 @@ return [
 
         'casts' => [
             '*_json' => 'json',
+            'character*' => 'string',
+            'timestamp*' => 'timestamp',
         ],
 
         /*
@@ -343,8 +345,8 @@ return [
         |                       generates User::posts() and not User::posts_user()
         */
 
-        'relation_name_strategy' => 'related',
-        // 'relation_name_strategy' => 'foreign_key',
+        // 'relation_name_strategy' => 'related',
+        'relation_name_strategy' => 'foreign_key',
 
         /*
          |--------------------------------------------------------------------------

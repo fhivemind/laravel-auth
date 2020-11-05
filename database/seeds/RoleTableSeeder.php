@@ -6,12 +6,12 @@ class RoleTableSeeder extends BaseSeeder
 {
     public function runAlways()
     {
-        Role::firstOrCreate([
+        Role::create([
             'name' => 'admin',
             'description' => 'Administrator Users',
         ]);
 
-        Role::firstOrCreate([
+        Role::create([
             'name' => 'regular',
             'description' => 'Regular Users',
         ]);

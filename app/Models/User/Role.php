@@ -9,15 +9,10 @@ class Role extends BaseModel
      */
     public const ROLE_ADMIN = 'admin';
 
-    /**
-     * @var int Auto increments integer key
-     */
-    public $primaryKey = 'role_id';
+    protected $table = 'role';
+    public $timestamps = false;
 
-    /**
-     * @var string UUID key
-     */
-    public $uuidKey = 'role_uuid';
+    public static $itemWith = ['users'];
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +20,26 @@ class Role extends BaseModel
      * @var array
      */
     protected $fillable = [
-        'name', 'description',
+        'name',
+        'description',
     ];
+
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'int',
+        'name' => 'string',
+        'description' => 'string'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function users()
+    {
+        return $this->hasMany(\App\Models\UserRole::class, 'id_role');
+    }
 }

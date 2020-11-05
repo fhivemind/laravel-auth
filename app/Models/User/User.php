@@ -21,15 +21,12 @@ class User extends BaseModel implements
 {
     use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
-    /**
-     * @var int Auto increments integer key
-     */
-    public $primaryKey = 'user_id';
+    protected $table = 'user';
 
     /**
      * @var array Relations to load implicitly by Restful controllers
      */
-    public static $itemWith = ['primaryRole', 'roles'];
+    public static $itemWith = ['roles'];
 
     /**
      * The attributes that are mass assignable.
@@ -37,7 +34,14 @@ class User extends BaseModel implements
      * @var array
      */
     protected $fillable = [
-        'name', 'email', 'password', 'primary_role',
+        'username',
+        'email',
+        'first_name',
+        'last_name',
+        'phone_number',
+        'active',
+        'comment',
+        'id_country'
     ];
 
     /**
@@ -46,7 +50,9 @@ class User extends BaseModel implements
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token', 'email_verified_at', 'primary_role',
+        'password',
+        'token',
+        'token_expires_at',
     ];
 
     /**
@@ -55,7 +61,18 @@ class User extends BaseModel implements
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+        'id' => 'integer',
+        'username' => 'string',
+        'email' => 'string',
+        'first_name' => 'string',
+        'last_name' => 'string',
+        'phone_number' => 'string',
+        'active' => 'boolean',
+        'password' => 'string',
+        'token' => 'string',
+        'token_expires_at' => 'datetime',
+        'comment' => 'string',
+        'id_country' => 'integer'
     ];
 
     /**
@@ -81,30 +98,20 @@ class User extends BaseModel implements
     public function getValidationRules()
     {
         return [
-            'email' => 'email|max:255|unique:users',
-            'name'  => 'required|min:3',
-            'password' => 'required|min:6',
+            'username' => 'required|min:3',
+            'email' => 'email|max:255|unique:user',
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'active' => 'required|boolean',
+            'password' => 'nullable|string',
+            'token' => 'nullable|string',
+            'token_expires_at' => 'nullable',
+            'comment' => 'nullable|string',
+            'created_at' => 'required',
+            'updated_at' => 'nullable',
+            'id_country' => 'nullable|integer'
         ];
-    }
-
-    /**
-     * User's primary role
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsTo
-     */
-    public function primaryRole()
-    {
-        return $this->belongsTo(Role::class, 'primary_role');
-    }
-
-    /**
-     * User's secondary roles
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\belongsToMany
-     */
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
 
     /**
@@ -112,14 +119,7 @@ class User extends BaseModel implements
      */
     public function getRoles()
     {
-        $allRoles = array_merge(
-            [
-                $this->primaryRole->name,
-            ],
-            $this->roles->pluck('name')->toArray()
-        );
-
-        return $allRoles;
+        return $this->roles()->pluck('name')->toArray();
     }
 
     /**
@@ -129,7 +129,7 @@ class User extends BaseModel implements
      */
     public function isAdmin()
     {
-        return $this->primaryRole->name == Role::ROLE_ADMIN;
+        return in_array(Role::ROLE_ADMIN, $this->getRoles());
     }
 
     /**
@@ -154,8 +154,7 @@ class User extends BaseModel implements
         return [
             'user' => [
                 'id' => $this->getKey(),
-                'name' => $this->name,
-                'primaryRole' => $this->primaryRole->name,
+                'email' => $this->email
             ],
         ];
     }
@@ -169,4 +168,67 @@ class User extends BaseModel implements
     {
         return $this->getKeyName();
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function roles()
+    {
+        return $this->hasManyThrough(\App\Models\Role::class, \App\Models\UserRole::class, 'id_user', 'id', 'id', 'id_role');
+    }
+
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+//     **/
+//    public function idCountry()
+//    {
+//        return $this->belongsTo(\App\Models\Country::class, 'id_country');
+//    }
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function projectUsers()
+//    {
+//        return $this->hasMany(\App\Models\ProjectUser::class, 'id_user');
+//    }
+//
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function referrals()
+//    {
+//        return $this->hasMany(\App\Models\Referral::class, 'user_id');
+//    }
+//
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function referral1s()
+//    {
+//        return $this->hasMany(\App\Models\Referral::class, 'referral_user_id');
+//    }
+//
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function userLogs()
+//    {
+//        return $this->hasMany(\App\Models\UserLog::class, 'id_user');
+//    }
+//
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function tasks()
+//    {
+//        return $this->hasMany(\App\Models\Task::class, 'id_user');
+//    }
+//
+//    /**
+//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+//     **/
+//    public function organizationUsers()
+//    {
+//        return $this->hasMany(\App\Models\OrganizationUser::class, 'id_user');
+//    }
 }

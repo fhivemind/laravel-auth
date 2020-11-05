@@ -19,31 +19,20 @@ class UserStorySeeder extends BaseSeeder
 
         // Create an admin user
         factory(App\Models\User::class)->create([
-            'name'         => 'Admin',
-            'email'        => static::ADMIN_CREDENTIALS['email'],
-            'primary_role' => $roles->where('name', 'admin')->first()->role_id,
+            'username' => 'Admin',
+            'email'    => static::ADMIN_CREDENTIALS['email']
         ]);
 
         // Create regular user
         factory(App\Models\User::class)->create([
-            'name'         => 'Bob',
-            'email'        => 'bob@bob.com',
-            'primary_role' => $roles->where('name', 'regular')->first()->role_id,
+            'username' => 'Bob',
+            'email'    => 'bob@bob.com'
         ]);
 
-        // Get some random roles to assign to users
-        $fakeRolesToAssignCount = 3;
-        $fakeRolesToAssign = RoleTableSeeder::getRandomRoles($fakeRolesToAssignCount);
-
-        // Assign fake roles to users
-        for ($i = 0; $i < 5; ++$i) {
-            $user = factory(App\Models\User::class)->create([
-                'primary_role' => $roles->random()->role_id,
-            ]);
-
-            for ($j = 0; $j < count($fakeRolesToAssign); ++$j) {
-                $user->roles()->save($fakeRolesToAssign->shift());
-            }
-        }
+        factory(App\Models\UserRole::class)->create([
+            'active' => true,
+            'id_role' => Role::all()->where('name', '=', 'admin')->first()->$id,
+            'id_user' => User::all()->where('username', '=', 'admin')->first()->$id
+        ]);
     }
 }
