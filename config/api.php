@@ -215,7 +215,7 @@ return [
 
     'formats' => [
 
-        'json' => Specialtactics\L5Api\Http\Response\Format\Json::class,
+        'json' => App\Http\Response\Format\Json::class,
 
     ],
 
@@ -226,7 +226,7 @@ return [
             'indent_style' => env('API_JSON_FORMAT_INDENT_STYLE', 'space'),
             'indent_size' => env('API_JSON_FORMAT_INDENT_SIZE', 2),
         ],
-        'caseType' => env('API_CASE_TYPE', 'camel-case'),
+        'caseType' => env('API_CASE_TYPE', 'snake-case'),
         'transform_keys_levels' => env('API_TRANSFORM_KEYS_LEVELS', null),
     ],
 

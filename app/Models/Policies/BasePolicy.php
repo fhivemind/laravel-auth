@@ -3,7 +3,7 @@
 namespace App\Models\Policies;
 
 use App\Models\User;
-use Specialtactics\L5Api\Policies\RestfulModelPolicy;
+use App\Policies\RestfulModelPolicy;
 
 class BasePolicy extends RestfulModelPolicy
 {

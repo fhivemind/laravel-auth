@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Specialtactics\L5Api\Models\RestfulModel;
+use App\Models\RestfulModel;
 
 class BaseModel extends RestfulModel
 {
@@ -22,4 +22,9 @@ class BaseModel extends RestfulModel
      * @var string Set to string for UUID keys
      */
     protected $keyType = 'int';
+
+    /**
+     * @var string Set to true for UUID keys
+     */
+    protected $usesUUID = false;
 }

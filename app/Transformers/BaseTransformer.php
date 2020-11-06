@@ -2,7 +2,7 @@
 
 namespace App\Transformers;
 
-use Specialtactics\L5Api\Transformers\RestfulTransformer;
+use App\Transformers\RestfulTransformer;
 
 class BaseTransformer extends RestfulTransformer
 {
