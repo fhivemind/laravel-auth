@@ -25,7 +25,7 @@ class UserRoleSeeder extends BaseSeeder
             'id_user' => $users->where('username', '=', 'Admin')->first()->id
         ]);
 
-        for ($i = 0; $i < 10; ++$i) {
+        for ($i = 0; $i < 5; ++$i) {
             UserRole::firstOrCreate([
                 'active' => true,
                 'id_role' => $roles->random()->id,

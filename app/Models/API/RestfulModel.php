@@ -29,11 +29,6 @@ class RestfulModel extends Model
     protected $keyType = 'string';
 
     /**
-     * @var string Set to true for UUID keys
-     */
-    protected $usesUUID = true;
-
-    /**
      * These attributes (in addition to primary & uuid keys) are not allowed to be updated explicitly through
      *  API routes of update and put. They can still be updated internally by Laravel, and your own code.
      *
@@ -118,7 +113,7 @@ class RestfulModel extends Model
             // If the PK(s) are missing, generate them
             $uuidKeyName = $model->getKeyName();
 
-            if ($uuidKeyName && $model->usesUUID && ! is_array($uuidKeyName) && ! array_key_exists($uuidKeyName, $model->getAttributes())) {
+            if ($uuidKeyName && ! $model->incrementing && ! is_array($uuidKeyName) && ! array_key_exists($uuidKeyName, $model->getAttributes())) {
                 $model->$uuidKeyName = Uuid::uuid4()->toString();
             }
         });

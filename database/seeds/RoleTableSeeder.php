@@ -10,6 +10,11 @@ class RoleTableSeeder extends BaseSeeder
             'name' => 'admin',
             'description' => 'Administrator Users',
         ]);
+        
+        Role::create([
+            'name' => 'editor',
+            'description' => 'Editor Users',
+        ]);
 
         Role::create([
             'name' => 'regular',
