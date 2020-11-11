@@ -1,14 +1,28 @@
 <?php
 
 namespace App\Models;
+use Spatie\QueryBuilder\AllowedFilter;
 
-class UserLogs extends BaseModel
+class UserLog extends BaseModel
 {
     /**
      * Table configuration
      */
     public $table = 'user_logs';
-    const UPDATED_AT = '';
+    const UPDATED_AT = null;
+
+    /**
+     * Return list of attributes for which the filtering is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedFilters()
+    {
+        return [
+            AllowedFilter::exact('id_user'),
+            AllowedFilter::exact('id'),
+        ];    
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -28,12 +42,12 @@ class UserLogs extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
+        'id' => 'int',
         'operation' => 'string',
         'scope' => 'string',
         'description' => 'string',
         'created_at' => 'datetime',
-        'id_user' => 'integer'
+        'id_user' => 'int'
     ];
 
     /**
@@ -41,13 +55,16 @@ class UserLogs extends BaseModel
      *
      * @var array
      */
-    public static $rules = [
-        'operation' => 'required|string',
-        'scope' => 'required|string',
-        'description' => 'nullable|string',
-        'created_at' => 'required',
-        'id_user' => 'required|integer'
-    ];
+    public function getValidationRules()
+    {
+        return [
+            'operation' => 'required',
+            'scope' => 'required',
+            'description' => 'nullable',
+            'created_at' => 'required',
+            'id_user' => 'required'
+        ];
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -2,7 +2,7 @@
 
 namespace App\Repositories;
 
-use App\Models\UserLogs;
+use App\Models\UserLog;
 use App\Repositories\BaseRepository;
 
 class UserLogsRepository extends BaseRepository
@@ -32,6 +32,6 @@ class UserLogsRepository extends BaseRepository
      **/
     public function model()
     {
-        return UserLogs::class;
+        return UserLog::class;
     }
 }

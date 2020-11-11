@@ -23,19 +23,10 @@ class BaseModel extends RestfulModel
      */
     protected $keyType = 'int';
 
-     /**
-     *
-     * @return array Set validation rule for model
-     */
-    public static $rules = [];
-
     /**
-     * Return the validation rules for this model
+     * The attributes that should be hidden for arrays and API output
      *
-     * @return array Rules
+     * @var array
      */
-    public function getValidationRules()
-    {
-        return static::$rules;
-    }
+    protected $hidden = ['laravel_through_key']; 
 }

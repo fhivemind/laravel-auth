@@ -59,7 +59,7 @@ class RestfulChildController extends BaseRestfulController
 
         // Form model's with relations for parent query
         $withArray = [];
-        foreach ($model::getCollectionWith() as $modelRelation) {
+        foreach ($model::getItemWith() as $modelRelation) {
             $withArray[] = $resourceRelationName . '.' . $modelRelation;
         }
 

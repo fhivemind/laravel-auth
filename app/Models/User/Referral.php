@@ -8,7 +8,7 @@ class Referral extends BaseModel
      * Table configuration
      */
     public $table = 'referral';
-    const UPDATED_AT = '';
+    const UPDATED_AT = null;
 
     /**
      * The attributes that are mass assignable.
@@ -36,11 +36,14 @@ class Referral extends BaseModel
      *
      * @var array
      */
-    public static $rules = [
-        'created_at' => 'required',
-        'user_id' => 'required|integer',
-        'referral_user_id' => 'required|integer'
-    ];
+    public function getValidationRules()
+    {
+        return [
+            'created_at' => 'required',
+            'user_id' => 'required|integer',
+            'referral_user_id' => 'required|integer'
+        ];
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

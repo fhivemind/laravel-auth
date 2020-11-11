@@ -37,29 +37,11 @@ class RestfulModel extends Model
     public $immutableAttributes = ['created_at', 'deleted_at'];
 
     /**
-     * Acts like $with (eager loads relations), however only for immediate controller requests for that object
-     * This is useful if you want to use "with" for immediate resource routes, however don't want these relations
-     *  always loaded in various service functions, for performance reasons
-     *
-     * @deprecated Use  getItemWith() and getCollectionWith()
-     * @var array Relations to load implicitly by Restful controllers
-     */
-    public static $localWith = null;
-
-    /**
      * What relations should one model of this entity be returned with, from a relevant controller
      *
      * @var null|array
      */
     public static $itemWith = [];
-
-    /**
-     * What relations should a collection of models of this entity be returned with, from a relevant controller
-     * If left null, then $itemWith will be used
-     *
-     * @var null|array
-     */
-    public static $collectionWith = null;
 
     /**
      * You can define a custom transformer for a model, if you wish to override the functionality of the Base transformer
@@ -95,6 +77,46 @@ class RestfulModel extends Model
      * @return array
      */
     public function getValidationMessages()
+    {
+        return [];
+    }
+
+    /**
+     * Return list of attributes for which the sorting is enabled.
+     * 
+     * @var array
+     */
+    public function getAllowedSorts()
+    {
+        return [];
+    }
+
+    /**
+     * Return list of attributes for which the filtering is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedFilters()
+    {
+        return [];
+    }
+
+    /**
+     * Return list of attributes for which the selecting is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedFields()
+    {
+        return [];
+    }
+
+    /**
+     * Return list of attributes for which the eager loading is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedIncludes()
     {
         return [];
     }
@@ -167,38 +189,13 @@ class RestfulModel extends Model
     }
 
     /**
-     * If using deprecated $localWith then use that
-     * Otherwise, use $itemWith
+     * Get list of eager loads relations.
      *
      * @return array
      */
     public static function getItemWith()
     {
-        if (is_null(static::$localWith)) {
-            return static::$itemWith;
-        } else {
-            return static::$localWith;
-        }
-    }
-
-    /**
-     * If using deprecated $localWith then use that
-     * Otherwise, if collectionWith hasn't been set, use $itemWith by default
-     * Otherwise, use collectionWith
-     *
-     * @return array
-     */
-    public static function getCollectionWith()
-    {
-        if (is_null(static::$localWith)) {
-            if (! is_null(static::$collectionWith)) {
-                return static::$collectionWith;
-            } else {
-                return static::$itemWith;
-            }
-        } else {
-            return static::$localWith;
-        }
+        return static::$itemWith;
     }
 
     /************************************************************

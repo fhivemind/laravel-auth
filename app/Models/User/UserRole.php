@@ -2,9 +2,6 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
 class UserRole extends BaseModel
 {
     /**
@@ -45,12 +42,15 @@ class UserRole extends BaseModel
      *
      * @var array
      */
-    public static $rules = [
-        'active' => 'required|boolean',
-        'created_at' => 'required',
-        'id_role' => 'required|integer',
-        'id_user' => 'required|integer'
-    ];
+    public function getValidationRules()
+    {
+        return [
+            'active' => 'required|boolean',
+            'created_at' => 'required',
+            'id_role' => 'required|integer',
+            'id_user' => 'required|integer'
+        ];
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

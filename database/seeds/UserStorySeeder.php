@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Referral;
 use App\Models\Role;
 use App\Models\User;
 
@@ -29,10 +30,20 @@ class UserStorySeeder extends BaseSeeder
             'email'    => 'bob@bob.com'
         ]);
 
-        factory(App\Models\UserRole::class)->create([
-            'active' => true,
-            'id_role' => Role::all()->where('name', '=', 'admin')->first()->$id,
-            'id_user' => User::all()->where('username', '=', 'admin')->first()->$id
+        // Create regular user
+        factory(App\Models\User::class)->create([
+            'username' => 'Alice',
+            'email'    => 'alice@alice.com'
+        ]);
+
+        Referral::firstOrCreate([
+            'user_id' => 1,
+            'referral_user_id' => 2,
+        ]);
+        
+        Referral::firstOrCreate([
+            'user_id' => 1,
+            'referral_user_id' => 3,
         ]);
     }
 }

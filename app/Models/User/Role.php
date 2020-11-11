@@ -36,9 +36,12 @@ class Role extends BaseModel
      *
      * @var array
      */
-    public static $rules = [
-        'name' => 'required'
-    ];
+    public function getValidationRules()
+    {
+        return [
+            'name' => 'required'
+        ];
+    }
 
     /**
      * The attributes that should be casted to native types.

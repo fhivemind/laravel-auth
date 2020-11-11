@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Cache;
@@ -34,7 +35,7 @@ class RestfulController extends BaseRestfulController
      *
      * @return \Dingo\Api\Http\Response
      */
-    public function getAll()
+    public function getAll(Request $request)
     {
         $this->authorizeUserAction('viewAll');
 
@@ -42,13 +43,35 @@ class RestfulController extends BaseRestfulController
 
         // If we are caching the endpont, do a simple get all resources
         if (static::$cacheAll) {
-            return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model) {
-                return $model::with($model::getCollectionWith())->get();
+            return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model, $request) {
+                $query = QueryBuilder::for($model::with($model::getItemWith()));
+
+                if ($fields = $model::getItemWith()) {
+                    $query = $query->allowedFields($fields);
+                }
+
+                return $query->get();
             }), $this->getTransformer());
         }
 
-        $query = $model::with($model::getCollectionWith());
+        $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
         $this->qualifyCollectionQuery($query);
+
+        if ($filters = $model->getAllowedFilters()) {
+            $query = $query->allowedFilters($filters);
+        }
+
+        if ($sorts = $model->getAllowedSorts()) {
+            $query = $query->allowedSorts($sorts);
+        }
+
+        if ($fields = $model->getAllowedFields()) {
+            $query = $query->allowedFields($fields);
+        }
+
+        if ($includes = $model->getAllowedIncludes()) {
+            $query = $query->allowedIncludes($includes);
+        }
 
         // Handle pagination, if applicable
         $perPage = $model->getPerPage();
@@ -58,7 +81,7 @@ class RestfulController extends BaseRestfulController
                 $perPage = intval(request()->input('per_page'));
             }
 
-            $paginator = $query->paginate($perPage);
+            $paginator = $query->paginate($perPage)->appends(request()->only(['filter', 'sort']));;
 
             return $this->response->paginator($paginator, $this->getTransformer());
         } else {
@@ -75,7 +98,7 @@ class RestfulController extends BaseRestfulController
      * @return \Dingo\Api\Http\Response
      * @throws HttpException
      */
-    public function get($uuid)
+    public function get($uuid, Request $request)
     {
         $model = new static::$model;
 

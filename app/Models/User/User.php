@@ -32,6 +32,46 @@ class User extends BaseModel implements
     public static $itemWith = ['roles'];
 
     /**
+     * Return list of attributes for which the sorting is enabled.
+     * 
+     * @var array
+     */
+    public function getAllowedSorts()
+    {
+        return ['username'];
+    }
+
+    /**
+     * Return list of attributes for which the filtering is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedFilters()
+    {
+        return ['email'];
+    }
+
+    /**
+     * Return list of attributes for which the eager loading is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedIncludes()
+    {
+        return ['logs', 'referrals', 'referred_by'];
+    }
+
+    /**
+     * Return list of attributes for which the selecting is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedFields()
+    {
+        return ['logs', 'referrals', 'email'];
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -83,21 +123,24 @@ class User extends BaseModel implements
      *
      * @var array
      */
-    public static $rules = [
-        'username' => 'required|min:3',
-        'email' => 'email|max:255|unique:user',
-        'first_name' => 'nullable|string',
-        'last_name' => 'nullable|string',
-        'phone_number' => 'nullable|string',
-        'active' => 'required|boolean',
-        'password' => 'nullable|string',
-        'token' => 'nullable|string',
-        'token_expires_at' => 'nullable',
-        'comment' => 'nullable|string',
-        'created_at' => 'required',
-        'updated_at' => 'nullable',
-        'id_country' => 'nullable|integer'
-    ];
+    public function getValidationRules()
+    {
+        return [
+            'username' => 'required|min:3',
+            'email' => 'email|max:255|unique:user',
+            'first_name' => 'nullable|string',
+            'last_name' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'active' => 'required|boolean',
+            'password' => 'nullable|string',
+            'token' => 'nullable|string',
+            'token_expires_at' => 'nullable',
+            'comment' => 'nullable|string',
+            'created_at' => 'required',
+            'updated_at' => 'nullable',
+            'id_country' => 'nullable|integer'
+        ];
+    }
 
     /**
      * Model's boot function
@@ -202,30 +245,30 @@ class User extends BaseModel implements
 //        return $this->hasMany(\App\Models\ProjectUser::class, 'id_user');
 //    }
 //
-//    /**
-//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-//     **/
-//    public function referrals()
-//    {
-//        return $this->hasMany(\App\Models\Referral::class, 'user_id');
-//    }
-//
-//    /**
-//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-//     **/
-//    public function referral1s()
-//    {
-//        return $this->hasMany(\App\Models\Referral::class, 'referral_user_id');
-//    }
-//
-//    /**
-//     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-//     **/
-//    public function userLogs()
-//    {
-//        return $this->hasMany(\App\Models\UserLog::class, 'id_user');
-//    }
-//
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function referrals()
+    {
+        return $this->hasMany(\App\Models\Referral::class, 'user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function referredBy()
+    {
+        return $this->hasOne(\App\Models\Referral::class, 'referral_user_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function logs()
+    {
+        return $this->hasMany(\App\Models\UserLog::class, 'id_user');
+    }
+
 //    /**
 //     * @return \Illuminate\Database\Eloquent\Relations\HasMany
 //     **/

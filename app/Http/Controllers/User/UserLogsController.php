@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserLogs;
+use App\Models\UserLog;
 
 class UserLogsController extends Controller
 {
-    public static $model = UserLogs::class;
+    public static $model = UserLog::class;
 }
