@@ -5,14 +5,21 @@ namespace App\Models;
 class Role extends BaseModel
 {
     /**
-     * Role constants
+     * Table configuration
      */
-    public const ROLE_ADMIN = 'admin';
-
     protected $table = 'role';
     public $timestamps = false;
 
-    public static $itemWith = ['users'];
+    /**
+     * Role constants
+     */
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_EDITOR = 'editor';
+
+    /**
+     * @var array Relations to load implicitly by Restful controllers
+     */
+    public static $itemWith = [];
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +29,15 @@ class Role extends BaseModel
     protected $fillable = [
         'name',
         'description',
+    ];
+
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        'name' => 'required'
     ];
 
     /**

@@ -22,4 +22,20 @@ class BaseModel extends RestfulModel
      * @var string Set to string for UUID keys
      */
     protected $keyType = 'int';
+
+     /**
+     *
+     * @return array Set validation rule for model
+     */
+    public static $rules = [];
+
+    /**
+     * Return the validation rules for this model
+     *
+     * @return array Rules
+     */
+    public function getValidationRules()
+    {
+        return static::$rules;
+    }
 }

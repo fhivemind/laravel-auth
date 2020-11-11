@@ -2,20 +2,13 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-
-class UserRole extends BaseModel
+class UserLogs extends BaseModel
 {
     /**
      * Table configuration
      */
-    protected $table = 'user_role';
-
-    /**
-     * @var array Relations to load implicitly by Restful controllers
-     */
-    public static $itemWith = ['role'];
+    public $table = 'user_logs';
+    const UPDATED_AT = '';
 
     /**
      * The attributes that are mass assignable.
@@ -23,8 +16,9 @@ class UserRole extends BaseModel
      * @var array
      */
     public $fillable = [
-        'active',
-        'id_role',
+        'operation',
+        'scope',
+        'description',
         'id_user'
     ];
 
@@ -34,9 +28,11 @@ class UserRole extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'int',
-        'active' => 'boolean',
-        'id_role' => 'integer',
+        'id' => 'integer',
+        'operation' => 'string',
+        'scope' => 'string',
+        'description' => 'string',
+        'created_at' => 'datetime',
         'id_user' => 'integer'
     ];
 
@@ -46,19 +42,12 @@ class UserRole extends BaseModel
      * @var array
      */
     public static $rules = [
-        'active' => 'required|boolean',
+        'operation' => 'required|string',
+        'scope' => 'required|string',
+        'description' => 'nullable|string',
         'created_at' => 'required',
-        'id_role' => 'required|integer',
         'id_user' => 'required|integer'
     ];
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     **/
-    public function role()
-    {
-        return $this->belongsTo(\App\Models\Role::class, 'id_role');
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

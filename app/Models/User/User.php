@@ -21,6 +21,9 @@ class User extends BaseModel implements
 {
     use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
+    /**
+     * Table configuration
+     */
     protected $table = 'user';
 
     /**
@@ -76,6 +79,27 @@ class User extends BaseModel implements
     ];
 
     /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        'username' => 'required|min:3',
+        'email' => 'email|max:255|unique:user',
+        'first_name' => 'nullable|string',
+        'last_name' => 'nullable|string',
+        'phone_number' => 'nullable|string',
+        'active' => 'required|boolean',
+        'password' => 'nullable|string',
+        'token' => 'nullable|string',
+        'token_expires_at' => 'nullable',
+        'comment' => 'nullable|string',
+        'created_at' => 'required',
+        'updated_at' => 'nullable',
+        'id_country' => 'nullable|integer'
+    ];
+
+    /**
      * Model's boot function
      */
     public static function boot()
@@ -88,30 +112,6 @@ class User extends BaseModel implements
                 $user->password = Hash::make($user->password);
             }
         });
-    }
-
-    /**
-     * Return the validation rules for this model
-     *
-     * @return array Rules
-     */
-    public function getValidationRules()
-    {
-        return [
-            'username' => 'required|min:3',
-            'email' => 'email|max:255|unique:user',
-            'first_name' => 'nullable|string',
-            'last_name' => 'nullable|string',
-            'phone_number' => 'nullable|string',
-            'active' => 'required|boolean',
-            'password' => 'nullable|string',
-            'token' => 'nullable|string',
-            'token_expires_at' => 'nullable',
-            'comment' => 'nullable|string',
-            'created_at' => 'required',
-            'updated_at' => 'nullable',
-            'id_country' => 'nullable|integer'
-        ];
     }
 
     /**
@@ -130,6 +130,16 @@ class User extends BaseModel implements
     public function isAdmin()
     {
         return in_array(Role::ROLE_ADMIN, $this->getRoles());
+    }
+
+    /**
+     * Is this user an editor?
+     *
+     * @return bool
+     */
+    public function isEditor()
+    {
+        return in_array(Role::ROLE_EDITOR, $this->getRoles());
     }
 
     /**

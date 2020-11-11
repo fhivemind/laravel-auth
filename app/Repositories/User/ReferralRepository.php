@@ -2,21 +2,17 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
+use App\Models\Referral;
 use App\Repositories\BaseRepository;
 
-class UserRepository extends BaseRepository
+class ReferralRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name',
-        'email',
-        'email_verified_at',
-        'password',
-        'primary_role',
-        'remember_token'
+        'user_id',
+        'referral_user_id'
     ];
 
     /**
@@ -34,6 +30,6 @@ class UserRepository extends BaseRepository
      **/
     public function model()
     {
-        return User::class;
+        return Referral::class;
     }
 }

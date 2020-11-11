@@ -2,21 +2,19 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
+use App\Models\UserLogs;
 use App\Repositories\BaseRepository;
 
-class UserRepository extends BaseRepository
+class UserLogsRepository extends BaseRepository
 {
     /**
      * @var array
      */
     protected $fieldSearchable = [
-        'name',
-        'email',
-        'email_verified_at',
-        'password',
-        'primary_role',
-        'remember_token'
+        'operation',
+        'scope',
+        'description',
+        'id_user'
     ];
 
     /**
@@ -34,6 +32,6 @@ class UserRepository extends BaseRepository
      **/
     public function model()
     {
-        return User::class;
+        return UserLogs::class;
     }
 }
