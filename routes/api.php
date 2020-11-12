@@ -93,7 +93,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Referrals
          */
-        $api->group(['prefix' => 'referral'], function (Router $api) {
+        $api->group(['prefix' => 'referrals'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\ReferralController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\ReferralController@get');
         });
