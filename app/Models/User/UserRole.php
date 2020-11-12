@@ -46,7 +46,7 @@ class UserRole extends BaseModel
     {
         return [
             'active' => 'required|boolean',
-            'created_at' => 'required',
+            'created_at' => 'nullable',
             'id_role' => 'required|integer',
             'id_user' => 'required|integer'
         ];

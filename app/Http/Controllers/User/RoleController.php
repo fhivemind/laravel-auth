@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Role;
-use Illuminate\Http\Request;
+use App\Repositories\RoleRepository;
 
 class RoleController extends Controller
 {
-    public static $model = Role::class;
+    public static function repository() {
+        return RoleRepository::class;
+    }
 }

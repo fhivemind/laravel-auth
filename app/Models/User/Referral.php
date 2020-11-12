@@ -39,7 +39,7 @@ class Referral extends BaseModel
     public function getValidationRules()
     {
         return [
-            'created_at' => 'required',
+            'created_at' => 'nullable',
             'user_id' => 'required|integer',
             'referral_user_id' => 'required|integer'
         ];

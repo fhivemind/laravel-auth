@@ -46,7 +46,7 @@ trait AuthorizesUserActionsOnModelsTrait
     {
         $user = auth()->user();
 
-        $modelPolicy = Gate::getPolicyFor(static::$model);
+        $modelPolicy = Gate::getPolicyFor(static::model());
 
         // If no policy exists for this model, then there's nothing to check
         if (is_null($modelPolicy)) {
@@ -77,7 +77,7 @@ trait AuthorizesUserActionsOnModelsTrait
 
         // If no arguments are specified, set it to the controller's model (default)
         if (empty($arguments)) {
-            $arguments = static::$model;
+            $arguments = static::model();
         }
 
         // Get policy for model

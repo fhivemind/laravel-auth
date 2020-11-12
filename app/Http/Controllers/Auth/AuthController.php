@@ -8,4 +8,8 @@ use App\Http\Controllers\Features\JWTAuthenticationTrait;
 class AuthController extends Controller
 {
     use JWTAuthenticationTrait;
+
+    public static function repository() {
+        return null;
+    }
 }

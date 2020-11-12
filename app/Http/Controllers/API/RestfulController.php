@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Cache;
 
-class RestfulController extends BaseRestfulController
+abstract class RestfulController extends BaseRestfulController
 {
     /**
      * Cache key for getAll() function - all of a collection's resources
@@ -39,39 +39,23 @@ class RestfulController extends BaseRestfulController
     {
         $this->authorizeUserAction('viewAll');
 
-        $model = new static::$model;
+        $model = $this->model;
 
         // If we are caching the endpont, do a simple get all resources
-        if (static::$cacheAll) {
-            return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model, $request) {
+        // Only allowed for empty request
+        if (static::$cacheAll && count($request->all()) === 0) {
+            return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model) {
                 $query = QueryBuilder::for($model::with($model::getItemWith()));
-
-                if ($fields = $model::getItemWith()) {
-                    $query = $query->allowedFields($fields);
-                }
 
                 return $query->get();
             }), $this->getTransformer());
         }
 
-        $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
+        // Create query from request
+        $query = static::requestQuery($request);
+        
+        // Validate query
         $this->qualifyCollectionQuery($query);
-
-        if ($filters = $model->getAllowedFilters()) {
-            $query = $query->allowedFilters($filters);
-        }
-
-        if ($sorts = $model->getAllowedSorts()) {
-            $query = $query->allowedSorts($sorts);
-        }
-
-        if ($fields = $model->getAllowedFields()) {
-            $query = $query->allowedFields($fields);
-        }
-
-        if ($includes = $model->getAllowedIncludes()) {
-            $query = $query->allowedIncludes($includes);
-        }
 
         // Handle pagination, if applicable
         $perPage = $model->getPerPage();
@@ -81,7 +65,7 @@ class RestfulController extends BaseRestfulController
                 $perPage = intval(request()->input('per_page'));
             }
 
-            $paginator = $query->paginate($perPage)->appends(request()->only(['filter', 'sort']));;
+            $paginator = $query->paginate($perPage)->appends(request()->query());;
 
             return $this->response->paginator($paginator, $this->getTransformer());
         } else {
@@ -100,12 +84,11 @@ class RestfulController extends BaseRestfulController
      */
     public function get($uuid, Request $request)
     {
-        $model = new static::$model;
-
-        $resource = $model::with($model::getItemWith())->where($model->getKeyName(), '=', $uuid)->first();
+        // Create query from request
+        $resource = static::requestQuery($request, [$this->model->getKeyName() => $uuid])->first();
 
         if (! $resource) {
-            throw new NotFoundHttpException('Resource \'' . class_basename(static::$model) . '\' with given UUID ' . $uuid . ' not found');
+            throw new NotFoundHttpException('Resource \'' . class_basename(static::model()) . '\' with given UUID ' . $uuid . ' not found');
         }
 
         $this->authorizeUserAction('view', $resource);
@@ -124,14 +107,14 @@ class RestfulController extends BaseRestfulController
     {
         $this->authorizeUserAction('create');
 
-        $model = new static::$model;
+        $model = $this->model;
 
         $this->restfulService->validateResource($model, $request->input());
 
         $resource = $this->restfulService->persistResource(new $model($request->input()));
 
         // Retrieve full model
-        $resource = $model::with($model::getItemWith())->where($model->getKeyName(), '=', $resource->getKey())->first();
+        $resource = static::requestQuery($request, [$this->model->getKeyName() => $resource->getKey()])->first();
 
         if ($this->shouldTransform()) {
             $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
@@ -151,13 +134,13 @@ class RestfulController extends BaseRestfulController
      */
     public function put(Request $request, $uuid)
     {
-        $model = static::$model::find($uuid);
+        $model = static::model()::find($uuid);
 
         if (! $model) {
             // Doesn't exist - create
             $this->authorizeUserAction('create');
 
-            $model = new static::$model;
+            $model = $this->model;
 
             $this->restfulService->validateResource($model, $request->input());
             $resource = $this->restfulService->persistResource(new $model($request->input()));
@@ -196,7 +179,7 @@ class RestfulController extends BaseRestfulController
      */
     public function patch($uuid, Request $request)
     {
-        $model = static::$model::findOrFail($uuid);
+        $model = static::model()::findOrFail($uuid);
 
         $this->authorizeUserAction('update', $model);
 
@@ -222,7 +205,7 @@ class RestfulController extends BaseRestfulController
      */
     public function delete($uuid)
     {
-        $model = static::$model::findOrFail($uuid);
+        $model = static::model()::findOrFail($uuid);
 
         $this->authorizeUserAction('delete', $model);
 
@@ -244,9 +227,36 @@ class RestfulController extends BaseRestfulController
     public static function getCacheKey(string $endpoint = 'getAll'): ?string
     {
         if ($endpoint == 'getAll') {
-            return sprintf(static::CACHE_KEY_GET_ALL, static::$model);
+            return sprintf(static::CACHE_KEY_GET_ALL, static::model());
         }
 
         return null;
+    }
+
+    public static function requestQuery(Request $request, $search = [])
+    {
+        $name = static::model();
+        $model = new $name;
+
+        // Create query
+        $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
+
+        // Searchable
+        if (count($search)) {
+            foreach($search as $key => $value) {
+                if (in_array($key, static::repository()::getFieldsSearchable())) {
+                    $query->where($key, $value);
+                }
+            }
+        }
+
+        // Apply additional request data
+        $query = $query
+            ->allowedFilters($model->getAllowedFilters())
+            ->allowedSorts($model->getAllowedSorts())
+            ->allowedFields($model->getAllowedFields())
+            ->allowedIncludes($model->getAllowedIncludes());
+
+        return $query;
     }
 }

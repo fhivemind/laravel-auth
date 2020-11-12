@@ -8,29 +8,25 @@ use App\Repositories\BaseRepository;
 class UserLogsRepository extends BaseRepository
 {
     /**
-     * @var array
-     */
-    protected $fieldSearchable = [
-        'operation',
-        'scope',
-        'description',
-        'id_user'
-    ];
-
-    /**
      * Return searchable fields
      *
      * @return array
      */
-    public function getFieldsSearchable()
+    public static function getFieldsSearchable()
     {
-        return $this->fieldSearchable;
+        return [
+            'id',
+            'operation',
+            'scope',
+            'description',
+            'id_user'
+        ];
     }
 
     /**
      * Configure the Model
      **/
-    public function model()
+    public static function model()
     {
         return UserLog::class;
     }

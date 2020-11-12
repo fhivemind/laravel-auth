@@ -7,17 +7,54 @@ use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use App\Services\RestfulService;
 use App\Helpers;
 
-class RestfulChildController extends BaseRestfulController
+abstract class RestfulChildController extends BaseRestfulController
 {
     /**
-     * Specify the parent model that you want to be associated with this controller. This is the parent model of the
-     * primary model the controller deals with
-     *
-     * @var \App\Models\BaseModel $model
+    * Specify the parent repository that you want to be associated with this controller. This is the parent repository of the
+    * primary repository the controller deals with
+    *
+    * @var \App\Repositories\BaseRepository $parentRepository
+    */
+    protected $parentRepository = null;
+
+    /**
+     *  @var \Illuminate\Database\Eloquent\Model
      */
-    public static $parentModel = null;
+    protected $parentModel = null;
+
+    /**
+     * Specify the parent repository that you want to be associated with this controller. This is the parent repository of the
+     * primary repository the controller deals with
+     *
+     * @return string
+     */
+    abstract public static function parentRepository();
+
+    /**
+     * Returns parent model associated with this Controller based on its parent repository.
+     *
+     * @return string
+     */
+    public static function parentModel()
+    {
+        return static::parentRepository()::model();
+    }
+
+    /**
+     * RestfulChildController constructor.
+     *
+     * @param RestfulService $restfulService
+     */
+    public function __construct(RestfulService $restfulService)
+    {
+        parent::__construct($restfulService);
+
+        $this->parentRepository = static::makeRepository(static::parentRepository());
+        $this->parentModel = $this->parentRepository->model();
+    }
 
     /**
      * These are the abilities which the authenticated user must be able to perform on the parent model
@@ -48,13 +85,13 @@ class RestfulChildController extends BaseRestfulController
     {
         $this->authorizeUserAction('viewAll');
 
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($uuid);
 
         // Authorize ability to view children models for parent
         $this->authorizeUserAction($this->parentAbilitiesRequired['view'], $parentResource);
 
-        $model = static::$model;
+        $model = static::model();
         $resourceRelationName = Helpers::modelRelationName($model);
 
         // Form model's with relations for parent query
@@ -85,13 +122,13 @@ class RestfulChildController extends BaseRestfulController
      */
     public function getOneFromParent($uuid, Request $request)
     {
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($uuid);
 
         // Authorize ability to view children models for parent
         $this->authorizeUserAction($this->parentAbilitiesRequired['view'], $parentResource);
 
-        $model = static::$model;
+        $model = static::model();
         $resourceRelationName = Helpers::modelRelationName($model, 'one');
 
         // Form model's with relations for parent query
@@ -127,24 +164,24 @@ class RestfulChildController extends BaseRestfulController
     public function get($parentUuid, $uuid)
     {
         // Check parent exists
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($parentUuid);
 
         // Authorize ability to view children model for parent
         $this->authorizeUserAction($this->parentAbilitiesRequired['view'], $parentResource);
 
         // Get resource
-        $model = new static::$model;
+        $model = $this->model;
         $resource = $model::with($model::getItemWith())->where($model->getKeyName(), '=', $uuid)->firstOrFail();
 
         // Check resource belongs to parent
         if ($resource->getAttribute(($parentResource->getKeyName())) != $parentResource->getKey()) {
-            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::$model) . '\' with given UUID ' . $uuid . ' does not belong to ' .
-                'resource \'' . class_basename(static::$parentModel) . '\' with given UUID ' . $parentUuid . '; ');
+            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::model()) . '\' with given UUID ' . $uuid . ' does not belong to ' .
+                'resource \'' . class_basename(static::parentModel()) . '\' with given UUID ' . $parentUuid . '; ');
         }
 
         if (! $resource) {
-            throw new NotFoundHttpException('Resource \'' . class_basename(static::$model) . '\' with given UUID ' . $uuid . ' not found');
+            throw new NotFoundHttpException('Resource \'' . class_basename(static::model()) . '\' with given UUID ' . $uuid . ' not found');
         }
 
         // Authorize ability to create this model
@@ -164,7 +201,7 @@ class RestfulChildController extends BaseRestfulController
     public function post($parentUuid, Request $request)
     {
         // Check parent exists
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($parentUuid);
 
         // Authorize ability to create children model for parent
@@ -174,7 +211,7 @@ class RestfulChildController extends BaseRestfulController
         $this->authorizeUserAction('create');
 
         $requestData = $request->input();
-        $model = new static::$model;
+        $model = $this->model;
 
         // Validate
         $this->restfulService->validateResource($model, $requestData);
@@ -182,7 +219,7 @@ class RestfulChildController extends BaseRestfulController
         // Set parent key in request data
         $resource = new $model($requestData);
 
-        $parentRelation = $parentResource->{$this->getChildRelationNameForParent($parentResource, static::$model)}();
+        $parentRelation = $parentResource->{$this->getChildRelationNameForParent($parentResource, static::model())}();
         $resource->{$parentRelation->getForeignKeyName()} = $parentUuid;
 
         // Create model in DB
@@ -212,20 +249,20 @@ class RestfulChildController extends BaseRestfulController
     public function patch($parentUuid, $uuid, Request $request)
     {
         // Check parent exists
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($parentUuid);
 
         // Authorize ability to update children models for parent
         $this->authorizeUserAction($this->parentAbilitiesRequired['update'], $parentResource);
 
         // Get resource
-        $model = new static::$model;
-        $resource = static::$model::findOrFail($uuid);
+        $model = $this->model;
+        $resource = static::model()::findOrFail($uuid);
 
         // Check resource belongs to parent
         if ($resource->getAttribute(($parentResource->getKeyName())) != $parentResource->getKey()) {
-            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::$model) . '\' with given UUID ' . $uuid . ' does not belong to ' .
-                'resource \'' . class_basename(static::$parentModel) . '\' with given UUID ' . $parentUuid . '; ');
+            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::model()) . '\' with given UUID ' . $uuid . ' does not belong to ' .
+                'resource \'' . class_basename(static::parentModel()) . '\' with given UUID ' . $parentUuid . '; ');
         }
 
         $this->authorizeUserAction('update', $resource);
@@ -259,20 +296,20 @@ class RestfulChildController extends BaseRestfulController
     public function delete($parentUuid, $uuid)
     {
         // Check parent exists
-        $parentModel = static::$parentModel;
+        $parentModel = static::parentModel();
         $parentResource = $parentModel::findOrFail($parentUuid);
 
         // Authorize ability to delete children model for parent
         $this->authorizeUserAction($this->parentAbilitiesRequired['delete'], $parentResource);
 
-        $resource = static::$model::findOrFail($uuid);
+        $resource = static::model()::findOrFail($uuid);
 
         $this->authorizeUserAction('delete', $resource);
 
         // Check resource belongs to parent
         if ($resource->getAttribute(($parentResource->getKeyName())) != $parentResource->getKey()) {
-            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::$model) . '\' with given UUID ' . $uuid . ' does not belong to ' .
-                'resource \'' . class_basename(static::$parentModel) . '\' with given UUID ' . $parentUuid . '; ');
+            throw new AccessDeniedHttpException('Resource \'' . class_basename(static::model()) . '\' with given UUID ' . $uuid . ' does not belong to ' .
+                'resource \'' . class_basename(static::parentModel()) . '\' with given UUID ' . $parentUuid . '; ');
         }
 
         $deletedCount = $resource->delete();

@@ -30,10 +30,10 @@ trait RestfulControllerTrait
         // Otherwise, check if model is specified
         else {
             // If it is, check if the controller's model specifies the transformer
-            if (! is_null(static::$model)) {
+            if (! is_null(static::model())) {
                 // If it does, use it
-                if (! is_null((static::$model)::$transformer)) {
-                    $transformer = (static::$model)::$transformer;
+                if (! is_null((static::model())::$transformer)) {
+                    $transformer = (static::model())::$transformer;
                 }
             }
         }

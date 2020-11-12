@@ -61,7 +61,7 @@ class UserLog extends BaseModel
             'operation' => 'required',
             'scope' => 'required',
             'description' => 'nullable',
-            'created_at' => 'required',
+            'created_at' => 'nullable',
             'id_user' => 'required'
         ];
     }

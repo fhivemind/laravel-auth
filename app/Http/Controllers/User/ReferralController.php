@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Referral;
+use App\Repositories\ReferralRepository;
 
 class ReferralController extends Controller
 {
-    public static $model = Referral::class;
+    public static function repository() {
+        return ReferralRepository::class;
+    }
 }

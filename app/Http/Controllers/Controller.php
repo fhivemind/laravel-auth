@@ -40,59 +40,7 @@ use App\Services\RestfulService;
  *      App\Models\Policies\BasePolicy
  * 
  */
-class Controller extends RestfulController
+abstract class Controller extends RestfulController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-
-    /**
-     * Specify the repository that you want to be associated with this controller.
-     *
-     * @var \App\Repositories\BaseRepository $repository
-     */
-    public static $repository = null;
-
-    /**
-     * Model Object associated with this controller. Created from static model field.
-     *
-     * @var \App\Models\BaseModel $model
-     */
-    private $modelCls = null;
-
-    /**
-     * @return \App\Models\BaseModel
-     */
-    protected function model() {
-        return $this->modelCls;
-    }
-
-    /**
-     * Repository Object associated with this controller. Created from static repository field.
-     *
-     * @var \App\Repositories\BaseRepository $repository
-     */
-    private $repositoryCls = null;
-
-    /**
-     * @return \App\Repositories\BaseRepository
-     */
-    protected function repository() {
-        return $this->repositoryCls;
-    }
-
-    /**
-     * Controller constructor.
-     *
-     * @param RestfulService $restfulService
-     */
-    public function __construct(RestfulService $restfulService)
-    {
-        parent::__construct($restfulService);
-
-        // Initialize class instances.
-        if (!is_null(static::$model))
-            $this->modelCls = new static::$model;
-            
-        if (!is_null(static::$repository))
-            $this->repositoryCls = new static::$repository;
-    }
 }

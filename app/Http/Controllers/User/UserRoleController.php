@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UserRole;
+use App\Repositories\UserRoleRepository;
 
 class UserRoleController extends Controller
 {
-    public static $model = UserRole::class;
+    public static function repository() {
+        return UserRoleRepository::class;
+    }
 }

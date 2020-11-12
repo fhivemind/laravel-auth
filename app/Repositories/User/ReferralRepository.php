@@ -8,27 +8,23 @@ use App\Repositories\BaseRepository;
 class ReferralRepository extends BaseRepository
 {
     /**
-     * @var array
-     */
-    protected $fieldSearchable = [
-        'user_id',
-        'referral_user_id'
-    ];
-
-    /**
      * Return searchable fields
      *
      * @return array
      */
-    public function getFieldsSearchable()
+    public static function getFieldsSearchable()
     {
-        return $this->fieldSearchable;
+        return [
+            'id',
+            'user_id',
+            'referral_user_id'
+        ];
     }
 
     /**
      * Configure the Model
      **/
-    public function model()
+    public static function model()
     {
         return Referral::class;
     }

@@ -11,7 +11,7 @@ abstract class BaseRepository
     /**
      * @var \App\Models\BaseModel
      */
-    protected $model;
+    protected $model = null;
 
     /**
      *
@@ -27,14 +27,14 @@ abstract class BaseRepository
      *
      * @return array
      */
-    abstract public function getFieldsSearchable();
+    abstract public static function getFieldsSearchable();
 
     /**
      * Configure the Model
      *
      * @return string
      */
-    abstract public function model();
+    abstract public static function model();
 
     /**
      * Make Model instance
@@ -45,11 +45,11 @@ abstract class BaseRepository
      */
     public function makeModel()
     {
-        $name = $this->model();
+        $name = static::model();
         $model = new $name;
 
         if (!$model instanceof Model) {
-            throw new \Exception("Class {$this->model()} must be an instance of Illuminate\\Database\\Eloquent\\Model");
+            throw new \Exception("Class {$name} must be an instance of Illuminate\\Database\\Eloquent\\Model");
         }
 
         return $this->model = $model;
@@ -83,7 +83,7 @@ abstract class BaseRepository
 
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, $this->getFieldsSearchable())) {
+                if (in_array($key, static::getFieldsSearchable())) {
                     $query->where($key, $value);
                 }
             }

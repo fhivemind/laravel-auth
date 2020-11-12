@@ -136,7 +136,7 @@ class User extends BaseModel implements
             'token' => 'nullable|string',
             'token_expires_at' => 'nullable',
             'comment' => 'nullable|string',
-            'created_at' => 'required',
+            'created_at' => 'nullable',
             'updated_at' => 'nullable',
             'id_country' => 'nullable|integer'
         ];

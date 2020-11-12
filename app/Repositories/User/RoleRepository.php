@@ -2,10 +2,10 @@
 
 namespace App\Repositories;
 
-use App\Models\User;
+use App\Models\Role;
 use App\Repositories\BaseRepository;
 
-class UserRepository extends BaseRepository
+class RoleRepository extends BaseRepository
 {
     /**
      * Return searchable fields
@@ -17,11 +17,7 @@ class UserRepository extends BaseRepository
         return [
             'id',
             'name',
-            'email',
-            'email_verified_at',
-            'password',
-            'primary_role',
-            'remember_token'
+            'description',
         ];
     }
 
@@ -30,6 +26,6 @@ class UserRepository extends BaseRepository
      **/
     public static function model()
     {
-        return User::class;
+        return Role::class;
     }
 }

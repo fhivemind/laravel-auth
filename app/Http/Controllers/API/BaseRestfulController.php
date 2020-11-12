@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Repositories\BaseRepository;
 use App\Services\RestfulService;
 use App\Transformers\BaseTransformer;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -10,7 +11,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Dingo\Api\Routing\Helpers;
 
-class BaseRestfulController extends Controller
+abstract class BaseRestfulController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     use Helpers;
@@ -23,12 +24,33 @@ class BaseRestfulController extends Controller
     protected $restfulService = null;
 
     /**
-     * Specify the model that you want to be associated with this controller. This is the primary model that
-     * the controller deals with
-     *
-     * @var \App\Models\BaseModel $model
+     *  @var \App\Repositories\BaseRepository
      */
-    public static $model = null;
+    protected $repository = null;
+
+    /**
+     *  @var \Illuminate\Database\Eloquent\Model
+     */
+    protected $model = null;
+
+    /**
+     * Specify the repository that you want to be associated with this controller.
+     *
+     * @return string
+     */
+    abstract public static function repository();
+
+    /**
+     * Returns model associated with this Controller based on its repository.
+     *
+     * @return string|null
+     */
+    public static function model()
+    {
+        if (! is_null(static::repository())) {
+            return static::repository()::model();
+        }
+    }
 
     /**
      * Usually a transformer will be associated with a model, however if you don't specify a model or with to
@@ -46,6 +68,30 @@ class BaseRestfulController extends Controller
      */
     public function __construct(RestfulService $restfulService)
     {
-        $this->restfulService = $restfulService->setModel(static::$model);
+        $this->restfulService = $restfulService->setModel(static::model());
+
+        if (! is_null(static::repository())) {
+            $this->repository = static::makeRepository(static::repository());
+            $this->model = $this->repository->makeModel();
+        }
+    }
+
+    /**
+     * Make Repository instance
+     *
+     * @param string $name
+     * @throws \Exception
+     *
+     * @return \App\Repositories\BaseRepository
+     */
+    public static function makeRepository(string $name)
+    {
+        $repository = new $name;
+
+        if (!$repository instanceof BaseRepository) {
+            throw new \Exception("Class {$name} must be an instance of App\\Repositories\\BaseRepository");
+        }
+
+        return $repository;
     }
 }
