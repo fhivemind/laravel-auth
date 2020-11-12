@@ -10,6 +10,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Dingo\Api\Routing\Helpers;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class BaseRestfulController extends Controller
 {
@@ -42,7 +43,7 @@ abstract class BaseRestfulController extends Controller
 
     /**
      * Returns model associated with this Controller based on its repository.
-     *
+     * 
      * @return string|null
      */
     public static function model()
@@ -69,25 +70,47 @@ abstract class BaseRestfulController extends Controller
     public function __construct(RestfulService $restfulService)
     {
         $this->restfulService = $restfulService->setModel(static::model());
-
-        if (! is_null(static::repository())) {
-            $this->repository = static::makeRepository(static::repository());
-            $this->model = $this->repository->makeModel();
-        }
+        $this->repository = static::makeRepository(static::repository());
+        $this->model = static::makeModel(static::model());
     }
 
     /**
-     * Make Repository instance
+     * Makes Model instance
      *
      * @param string $name
      * @throws \Exception
      *
-     * @return \App\Repositories\BaseRepository
+     * @return \Illuminate\Database\Eloquent\Model;|null
      */
-    public static function makeRepository(string $name)
+    public static function makeModel($name)
     {
-        $repository = new $name;
+        if (is_null($name)) {
+            return null;
+        }
 
+        $model = new $name;
+        if (!$model instanceof Model) {
+            throw new \Exception("Class {$name} must be an instance of Illuminate\\Database\\Eloquent\\Model");
+        }
+
+        return $model;
+    }
+
+    /**
+     * Makes Repository instance
+     *
+     * @param string $name
+     * @throws \Exception
+     *
+     * @return \App\Repositories\BaseRepository|null
+     */
+    public static function makeRepository($name)
+    {
+        if (is_null($name)) {
+            return null;
+        }
+        
+        $repository = new $name;
         if (!$repository instanceof BaseRepository) {
             throw new \Exception("Class {$name} must be an instance of App\\Repositories\\BaseRepository");
         }

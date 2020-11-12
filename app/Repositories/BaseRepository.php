@@ -22,13 +22,6 @@ abstract class BaseRepository
     }
 
     /**
-     * Get searchable fields array
-     *
-     * @return array
-     */
-    abstract public static function getFieldsSearchable();
-
-    /**
      * Configure the Model
      *
      * @return string
@@ -82,7 +75,7 @@ abstract class BaseRepository
 
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, static::getFieldsSearchable())) {
+                if (in_array($key, $this->model->getAllowedFilters())) {
                     $query->where($key, $value);
                 }
             }

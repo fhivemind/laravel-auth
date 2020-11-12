@@ -88,7 +88,7 @@ class RestfulModel extends Model
      */
     public function getAllowedSorts()
     {
-        return [];
+        return [$this->primaryKey] + $this->fillable;
     }
 
     /**
@@ -98,7 +98,7 @@ class RestfulModel extends Model
      */
     public function getAllowedFilters()
     {
-        return [];
+        return [$this->primaryKey] + $this->fillable;
     }
 
     /**
@@ -108,7 +108,7 @@ class RestfulModel extends Model
      */
     public function getAllowedFields()
     {
-        return [];
+        return [$this->primaryKey] + $this->fillable;
     }
 
     /**

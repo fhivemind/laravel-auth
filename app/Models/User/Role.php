@@ -9,6 +9,12 @@ class Role extends BaseModel
      */
     protected $table = 'role';
     public $timestamps = false;
+   
+    /**
+     * @var string ID key
+     */
+    public $primaryKey = 'id';
+    public $incrementing = true;
 
     /**
      * Role constants
@@ -32,6 +38,17 @@ class Role extends BaseModel
     ];
 
     /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'int',
+        'name' => 'string',
+        'description' => 'string'
+    ];
+
+    /**
      * Validation rules
      *
      * @var array
@@ -42,17 +59,6 @@ class Role extends BaseModel
             'name' => 'required'
         ];
     }
-
-    /**
-     * The attributes that should be casted to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'id' => 'int',
-        'name' => 'string',
-        'description' => 'string'
-    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

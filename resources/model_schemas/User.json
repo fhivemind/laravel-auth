@@ -1,8 +1,8 @@
 [
     {
-        "name": "id",
-        "dbType": "integer,true",
-        "htmlType": null,
+        "name": "uuid",
+        "dbType": "string",
+        "htmlType": "text",
         "validations": null,
         "searchable": false,
         "fillable": false,
@@ -15,7 +15,7 @@
         "name": "username",
         "dbType": "string",
         "htmlType": "text",
-        "validations": "required|string",
+        "validations": "required|string|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -27,7 +27,7 @@
         "name": "email",
         "dbType": "string",
         "htmlType": "text",
-        "validations": "required|string",
+        "validations": "required|string|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -39,7 +39,7 @@
         "name": "first_name",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -51,7 +51,7 @@
         "name": "last_name",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -63,7 +63,7 @@
         "name": "phone_number",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -75,7 +75,7 @@
         "name": "active",
         "dbType": "boolean",
         "htmlType": "checkbox,1",
-        "validations": "required|boolean",
+        "validations": "required|boolean|boolean",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -87,7 +87,7 @@
         "name": "password",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -99,7 +99,7 @@
         "name": "token",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -111,7 +111,7 @@
         "name": "token_expires_at",
         "dbType": "datetime:nullable",
         "htmlType": "date",
-        "validations": "nullable",
+        "validations": "nullable|nullable",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -123,7 +123,7 @@
         "name": "comment",
         "dbType": "string:nullable",
         "htmlType": "text",
-        "validations": "nullable|string",
+        "validations": "nullable|string|nullable|string",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -147,7 +147,7 @@
         "name": "updated_at",
         "dbType": "datetime:nullable",
         "htmlType": "date",
-        "validations": "nullable",
+        "validations": "nullable|nullable",
         "searchable": false,
         "fillable": false,
         "primary": false,
@@ -159,7 +159,7 @@
         "name": "id_country",
         "dbType": "integer,false",
         "htmlType": null,
-        "validations": "nullable|integer",
+        "validations": "nullable|integer|nullable|integer",
         "searchable": true,
         "fillable": true,
         "primary": false,
@@ -173,11 +173,23 @@
     },
     {
         "type": "relation",
-        "relation": "1tm,UserRole,id_user"
+        "relation": "1tm,UserRole,uuid_user"
     },
     {
         "type": "relation",
-        "relation": "1tm,ProjectUser,id_user"
+        "relation": "1tm,ProjectUser,uuid_user"
+    },
+    {
+        "type": "relation",
+        "relation": "1tm,OrganizationUser,uuid_user"
+    },
+    {
+        "type": "relation",
+        "relation": "1tm,Task,uuid_user"
+    },
+    {
+        "type": "relation",
+        "relation": "1tm,UserLog,uuid_user"
     },
     {
         "type": "relation",
@@ -186,17 +198,5 @@
     {
         "type": "relation",
         "relation": "1tm,Referral,referral_user_id"
-    },
-    {
-        "type": "relation",
-        "relation": "1tm,UserLog,id_user"
-    },
-    {
-        "type": "relation",
-        "relation": "1tm,Task,id_user"
-    },
-    {
-        "type": "relation",
-        "relation": "1tm,OrganizationUser,id_user"
     }
 ]

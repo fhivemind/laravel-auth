@@ -32,12 +32,14 @@ abstract class RestfulChildController extends BaseRestfulController
 
     /**
      * Returns parent model associated with this Controller based on its parent repository.
-     *
+     * 
      * @return string
      */
     public static function parentModel()
     {
-        return static::parentRepository()::model();
+        if (! is_null(static::parentRepository())) {
+            return static::parentRepository()::model();
+        }
     }
 
     /**
@@ -50,7 +52,7 @@ abstract class RestfulChildController extends BaseRestfulController
         parent::__construct($restfulService);
 
         $this->parentRepository = static::makeRepository(static::parentRepository());
-        $this->parentModel = $this->parentRepository->makeModel();
+        $this->parentModel = static::makeModel(static::parentModel());
     }
 
     /**

@@ -14,7 +14,7 @@ class UserLogSeeder extends BaseSeeder
                 'operation' => $this->faker->unique()->word(),
                 'scope' => $this->faker->unique()->word(),
                 'description' => $this->faker->sentence(),
-                'id_user' => $users->random()->id,
+                'uuid_user' => $users->random()->uuid,
             ]);
         }
     }

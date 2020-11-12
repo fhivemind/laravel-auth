@@ -44,7 +44,7 @@ class UserRepositoryTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $dbUser = $this->userRepo->find($user->id);
+        $dbUser = $this->userRepo->find($user->uuid);
 
         $dbUser = $dbUser->toArray();
         $this->assertModelData($user->toArray(), $dbUser);
@@ -58,10 +58,10 @@ class UserRepositoryTest extends TestCase
         $user = factory(User::class)->create();
         $fakeUser = factory(User::class)->make()->toArray();
 
-        $updatedUser = $this->userRepo->update($fakeUser, $user->id);
+        $updatedUser = $this->userRepo->update($fakeUser, $user->uuid);
 
         $this->assertModelData($fakeUser, $updatedUser->toArray());
-        $dbUser = $this->userRepo->find($user->id);
+        $dbUser = $this->userRepo->find($user->uuid);
         $this->assertModelData($fakeUser, $dbUser->toArray());
     }
 
@@ -72,9 +72,9 @@ class UserRepositoryTest extends TestCase
     {
         $user = factory(User::class)->create();
 
-        $resp = $this->userRepo->delete($user->id);
+        $resp = $this->userRepo->delete($user->uuid);
 
         $this->assertTrue($resp);
-        $this->assertNull(User::find($user->id), 'User should not exist in DB');
+        $this->assertNull(User::find($user->uuid), 'User should not exist in DB');
     }
 }

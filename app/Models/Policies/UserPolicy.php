@@ -30,7 +30,7 @@ class UserPolicy extends BasePolicy
     public function view(User $user, User $model)
     {
         
-        if($user->id === $model->id) {
+        if($user->uuid === $model->uuid) {
             return true;
         }
 
@@ -59,7 +59,7 @@ class UserPolicy extends BasePolicy
      */
     public function update(User $user, User $model)
     {
-        if($user->id === $model->id) {
+        if($user->uuid === $model->uuid) {
             return true;
         }
 

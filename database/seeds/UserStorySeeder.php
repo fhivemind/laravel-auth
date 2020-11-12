@@ -15,9 +15,6 @@ class UserStorySeeder extends BaseSeeder
 
     public function runFake()
     {
-        // Grab all roles for reference
-        $roles = Role::all();
-
         // Create an admin user
         factory(App\Models\User::class)->create([
             'username' => 'Admin',
@@ -36,14 +33,17 @@ class UserStorySeeder extends BaseSeeder
             'email'    => 'alice@alice.com'
         ]);
 
+        // Grab all roles for reference
+        $users = User::all();
+
         Referral::firstOrCreate([
-            'user_id' => 1,
-            'referral_user_id' => 2,
+            'user_id' => $users->where('username', '=', 'Admin')->first()->uuid,
+            'referral_user_id' => $users->where('username', '=', 'Bob')->first()->uuid,
         ]);
         
         Referral::firstOrCreate([
-            'user_id' => 1,
-            'referral_user_id' => 3,
+            'user_id' => $users->where('username', '=', 'Admin')->first()->uuid,
+            'referral_user_id' => $users->where('username', '=', 'Alice')->first()->uuid,
         ]);
     }
 }

@@ -243,8 +243,7 @@ abstract class RestfulController extends BaseRestfulController
     public static function requestQuery(Request $request, $search = [])
     {
         // Initialize model
-        $name = static::model();
-        $model = new $name;
+        $model = static::makeModel(static::model());
 
         // Create query
         $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
@@ -252,7 +251,7 @@ abstract class RestfulController extends BaseRestfulController
         // Append search parameters
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, static::repository()::getFieldsSearchable())) {
+                if (in_array($key, $model->getAllowedFilters())) {
                     $query->where($key, $value);
                 }
             }

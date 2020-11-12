@@ -22,14 +22,14 @@ class UserRoleSeeder extends BaseSeeder
         UserRole::create([
             'active' => true,
             'id_role' => $roles->where('name', '=', 'admin')->first()->id,
-            'id_user' => $users->where('username', '=', 'Admin')->first()->id
+            'uuid_user' => $users->where('username', '=', 'Admin')->first()->uuid
         ]);
 
         for ($i = 0; $i < 5; ++$i) {
             UserRole::firstOrCreate([
                 'active' => true,
                 'id_role' => $roles->random()->id,
-                'id_user' => $users->random()->id,
+                'uuid_user' => $users->random()->uuid,
             ]);
         }
     }

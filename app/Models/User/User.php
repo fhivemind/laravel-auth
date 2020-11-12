@@ -32,46 +32,6 @@ class User extends BaseModel implements
     public static $itemWith = ['roles'];
 
     /**
-     * Return list of attributes for which the sorting is enabled.
-     * 
-     * @var array
-     */
-    public function getAllowedSorts()
-    {
-        return ['username'];
-    }
-
-    /**
-     * Return list of attributes for which the filtering is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedFilters()
-    {
-        return ['email'];
-    }
-
-    /**
-     * Return list of attributes for which the eager loading is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedIncludes()
-    {
-        return ['logs', 'referrals', 'referred_by'];
-    }
-
-    /**
-     * Return list of attributes for which the selecting is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedFields()
-    {
-        return ['logs', 'referrals', 'email'];
-    }
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -104,7 +64,7 @@ class User extends BaseModel implements
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
+        'uuid' => 'string',
         'username' => 'string',
         'email' => 'string',
         'first_name' => 'string',
@@ -143,6 +103,16 @@ class User extends BaseModel implements
     }
 
     /**
+     * Return list of attributes for which the eager loading is enabled.
+     *
+     * @return array
+     */
+    public function getAllowedIncludes()
+    {
+        return ['logs', 'referrals', 'referred_by'];
+    }
+
+    /**
      * Model's boot function
      */
     public static function boot()
@@ -159,6 +129,9 @@ class User extends BaseModel implements
 
     /**
      * Get all user's roles
+     * 
+     * @return array
+     * 
      */
     public function getRoles()
     {
@@ -227,7 +200,7 @@ class User extends BaseModel implements
      **/
     public function roles()
     {
-        return $this->hasManyThrough(\App\Models\Role::class, \App\Models\UserRole::class, 'id_user', 'id', 'id', 'id_role');
+        return $this->hasManyThrough(\App\Models\Role::class, \App\Models\UserRole::class, 'uuid_user', 'id', 'uuid', 'id_role');
     }
 
 //    /**
@@ -242,7 +215,7 @@ class User extends BaseModel implements
 //     **/
 //    public function projectUsers()
 //    {
-//        return $this->hasMany(\App\Models\ProjectUser::class, 'id_user');
+//        return $this->hasMany(\App\Models\ProjectUser::class, 'uuid_user');
 //    }
 //
     /**
@@ -266,7 +239,7 @@ class User extends BaseModel implements
      **/
     public function logs()
     {
-        return $this->hasMany(\App\Models\UserLog::class, 'id_user');
+        return $this->hasMany(\App\Models\UserLog::class, 'uuid_user');
     }
 
 //    /**
@@ -274,7 +247,7 @@ class User extends BaseModel implements
 //     **/
 //    public function tasks()
 //    {
-//        return $this->hasMany(\App\Models\Task::class, 'id_user');
+//        return $this->hasMany(\App\Models\Task::class, 'uuid_user');
 //    }
 //
 //    /**
@@ -282,6 +255,6 @@ class User extends BaseModel implements
 //     **/
 //    public function organizationUsers()
 //    {
-//        return $this->hasMany(\App\Models\OrganizationUser::class, 'id_user');
+//        return $this->hasMany(\App\Models\OrganizationUser::class, 'uuid_user');
 //    }
 }

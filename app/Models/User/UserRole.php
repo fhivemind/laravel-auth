@@ -22,7 +22,7 @@ class UserRole extends BaseModel
     public $fillable = [
         'active',
         'id_role',
-        'id_user'
+        'uuid_user'
     ];
 
     /**
@@ -31,10 +31,10 @@ class UserRole extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'int',
+        'uuid' => 'string',
         'active' => 'boolean',
         'id_role' => 'integer',
-        'id_user' => 'integer'
+        'uuid_user' => 'string'
     ];
 
     /**
@@ -48,7 +48,7 @@ class UserRole extends BaseModel
             'active' => 'required|boolean',
             'created_at' => 'nullable',
             'id_role' => 'required|integer',
-            'id_user' => 'required|integer'
+            'uuid_user' => 'required|string'
         ];
     }
 
@@ -65,6 +65,6 @@ class UserRole extends BaseModel
      **/
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'id_user');
+        return $this->belongsTo(\App\Models\User::class, 'uuid_user');
     }
 }

@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-use Spatie\QueryBuilder\AllowedFilter;
 
 class UserLog extends BaseModel
 {
@@ -12,19 +11,6 @@ class UserLog extends BaseModel
     const UPDATED_AT = null;
 
     /**
-     * Return list of attributes for which the filtering is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedFilters()
-    {
-        return [
-            AllowedFilter::exact('id_user'),
-            AllowedFilter::exact('id'),
-        ];    
-    }
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
@@ -33,7 +19,7 @@ class UserLog extends BaseModel
         'operation',
         'scope',
         'description',
-        'id_user'
+        'uuid_user'
     ];
 
     /**
@@ -42,12 +28,12 @@ class UserLog extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'int',
+        'uuid' => 'string',
         'operation' => 'string',
         'scope' => 'string',
         'description' => 'string',
         'created_at' => 'datetime',
-        'id_user' => 'int'
+        'uuid_user' => 'string'
     ];
 
     /**
@@ -62,7 +48,7 @@ class UserLog extends BaseModel
             'scope' => 'required',
             'description' => 'nullable',
             'created_at' => 'nullable',
-            'id_user' => 'required'
+            'uuid_user' => 'required'
         ];
     }
 
@@ -71,6 +57,6 @@ class UserLog extends BaseModel
      **/
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'id_user');
+        return $this->belongsTo(\App\Models\User::class, 'uuid_user');
     }
 }

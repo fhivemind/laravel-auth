@@ -11,17 +11,7 @@ class BaseModel extends RestfulModel
      *
      * @var string ID key
      */
-    public $primaryKey = 'id';
-
-    /**
-     * @var bool Set to false for UUID keys
-     */
-    public $incrementing = true;
-
-    /**
-     * @var string Set to string for UUID keys
-     */
-    protected $keyType = 'int';
+    public $primaryKey = 'uuid';
 
     /**
      * The attributes that should be hidden for arrays and API output

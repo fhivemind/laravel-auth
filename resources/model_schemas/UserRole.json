@@ -48,7 +48,7 @@
         "inView": true
     },
     {
-        "name": "id_user",
+        "name": "uuid_user",
         "dbType": "integer,false",
         "htmlType": null,
         "validations": "required|integer",
@@ -65,6 +65,6 @@
     },
     {
         "type": "relation",
-        "relation": "mt1,User,id_user"
+        "relation": "mt1,User,uuid_user"
     }
 ]
