@@ -4,7 +4,19 @@ namespace App\Repositories;
 
 use Illuminate\Database\Eloquent\Model;
 
-
+/**
+ * 
+ * Implements BaseRepository.
+ * 
+ * 
+ * Controls the way how the model is being handled on a DB level. 
+ * This injects the DB logic into the model.
+ * 
+ * Serves as a bridge between model and controller.
+ * 
+ * @method public static function model()  returns model the repository controls
+ * 
+ */
 abstract class BaseRepository
 {
     /**

@@ -12,31 +12,32 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
  * 
  * 
  * Following methods have been implemented for every controller.
- * Each method checks authorization policy before invoking any
- * other methods.
+ * Each method checks authorization policy before invoking anything.
+ * Every method that accepts request supports advanced querying.
  * 
- *      > public function getAll()
- *      > public function get($id)
- *      > public function post(Request $request)
- *      > public function put(Request $request, $id)
- *      > public function patch($id, Request $request)
- *      > public function delete($id)
+ * @method public static function repository() - returns repository name connected to this controller
+ * @method public function getAll(Request $request) - GET /
+ * @method public function get($id, Request $request) - GET /{id}
+ * @method public function post(Request $request) - POST /
+ * @method public function put(Request $request, $id) - PUT /{id}
+ * @method public function patch($id, Request $request) - PATCH /{id}
+ * @method public function delete($id) - DELETE /{id}
  * 
+ * 
+ * @var BaseTransformer public static $transformer - transformer to use for controller resources 
+ * in case repository is unspecified
+ * 
+ * @var array
+ *      > "getAll" => "viewAll",          \
+ *      > "get"    => "view",             \
+ *      > "post"   => "create",           \
+ *      > "put"    => "create,update",    \
+ *      > "patch"  => "update",           \
+ *      > "delete" => "delete"
  * 
  * Function-to-Policy mappings shows which policy is invoked
  * for each method. 
  * 
- * MAPPINGS = [
- *      "getAll" => "viewAll"
- *      "get"    => "view"
- *      "post"   => "create"
- *      "put"    => "create,update"
- *      "patch"  => "update"
- *      "delete" => "delete"
- * ]
- * 
- * Complete list of Policy methods available at 
- *      App\Models\Policies\BasePolicy
  * 
  */
 abstract class Controller extends RestfulController
