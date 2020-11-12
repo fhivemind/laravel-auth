@@ -13,10 +13,7 @@ use App\Helpers;
 abstract class RestfulChildController extends BaseRestfulController
 {
     /**
-    * Specify the parent repository that you want to be associated with this controller. This is the parent repository of the
-    * primary repository the controller deals with
-    *
-    * @var \App\Repositories\BaseRepository $parentRepository
+    * @var \App\Repositories\BaseRepository
     */
     protected $parentRepository = null;
 
@@ -53,7 +50,7 @@ abstract class RestfulChildController extends BaseRestfulController
         parent::__construct($restfulService);
 
         $this->parentRepository = static::makeRepository(static::parentRepository());
-        $this->parentModel = $this->parentRepository->model();
+        $this->parentModel = $this->parentRepository->makeModel();
     }
 
     /**

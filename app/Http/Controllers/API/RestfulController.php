@@ -233,15 +233,23 @@ abstract class RestfulController extends BaseRestfulController
         return null;
     }
 
+    /**
+     * Builds a query based on provided Request and search parameters.
+     *
+     * @param Request $request
+     * @param array $search
+     * @return QueryBuilder
+     */
     public static function requestQuery(Request $request, $search = [])
     {
+        // Initialize model
         $name = static::model();
         $model = new $name;
 
         // Create query
         $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
 
-        // Searchable
+        // Append search parameters
         if (count($search)) {
             foreach($search as $key => $value) {
                 if (in_array($key, static::repository()::getFieldsSearchable())) {
@@ -250,7 +258,7 @@ abstract class RestfulController extends BaseRestfulController
             }
         }
 
-        // Apply additional request data
+        // Append request data
         $query = $query
             ->allowedFilters($model->getAllowedFilters())
             ->allowedSorts($model->getAllowedSorts())
