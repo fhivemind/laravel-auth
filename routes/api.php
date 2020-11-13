@@ -87,7 +87,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
          */
         $api->group(['prefix' => 'user_logs'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserLogsController@getAll');
-            $api->get('/{id}', 'App\Http\Controllers\UserLogsController@get');
+            $api->get('/{uuid}', 'App\Http\Controllers\UserLogsController@get');
         });
 
         /*

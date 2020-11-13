@@ -19,7 +19,7 @@ class UserLog extends BaseModel
         'operation',
         'scope',
         'description',
-        'uuid_user'
+        'id_user'
     ];
 
     /**
@@ -28,12 +28,12 @@ class UserLog extends BaseModel
      * @var array
      */
     protected $casts = [
-        'uuid' => 'string',
+        'id' => 'int',
         'operation' => 'string',
         'scope' => 'string',
         'description' => 'string',
         'created_at' => 'datetime',
-        'uuid_user' => 'string'
+        'id_user' => 'string'
     ];
 
     /**
@@ -48,7 +48,7 @@ class UserLog extends BaseModel
             'scope' => 'required',
             'description' => 'nullable',
             'created_at' => 'nullable',
-            'uuid_user' => 'required'
+            'id_user' => 'required'
         ];
     }
 
@@ -57,6 +57,6 @@ class UserLog extends BaseModel
      **/
     public function user()
     {
-        return $this->belongsTo(\App\Models\User::class, 'uuid_user');
+        return $this->belongsTo(\App\Models\User::class, 'id_user');
     }
 }

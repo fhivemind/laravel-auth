@@ -34,7 +34,7 @@ class BaseModel extends RestfulModel
      *
      * @var string ID key
      */
-    public $primaryKey = 'uuid';
+    public $primaryKey = 'id';
 
     /**
      * The attributes that should be hidden for arrays and API output

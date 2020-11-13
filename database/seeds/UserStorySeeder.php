@@ -37,13 +37,13 @@ class UserStorySeeder extends BaseSeeder
         $users = User::all();
 
         Referral::firstOrCreate([
-            'user_id' => $users->where('username', '=', 'Admin')->first()->uuid,
-            'referral_user_id' => $users->where('username', '=', 'Bob')->first()->uuid,
+            'user_id' => $users->where('username', '=', 'Admin')->first()->id,
+            'referral_user_id' => $users->where('username', '=', 'Bob')->first()->id,
         ]);
         
         Referral::firstOrCreate([
-            'user_id' => $users->where('username', '=', 'Admin')->first()->uuid,
-            'referral_user_id' => $users->where('username', '=', 'Alice')->first()->uuid,
+            'user_id' => $users->where('username', '=', 'Admin')->first()->id,
+            'referral_user_id' => $users->where('username', '=', 'Alice')->first()->id,
         ]);
     }
 }

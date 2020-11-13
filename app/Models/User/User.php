@@ -64,7 +64,7 @@ class User extends BaseModel implements
      * @var array
      */
     protected $casts = [
-        'uuid' => 'string',
+        'id' => 'int',
         'username' => 'string',
         'email' => 'string',
         'first_name' => 'string',
@@ -200,7 +200,7 @@ class User extends BaseModel implements
      **/
     public function roles()
     {
-        return $this->hasManyThrough(\App\Models\Role::class, \App\Models\UserRole::class, 'uuid_user', 'id', 'uuid', 'id_role');
+        return $this->hasManyThrough(\App\Models\Role::class, \App\Models\UserRole::class, 'id_user', 'id', 'id', 'id_role');
     }
 
 //    /**
@@ -215,7 +215,7 @@ class User extends BaseModel implements
 //     **/
 //    public function projectUsers()
 //    {
-//        return $this->hasMany(\App\Models\ProjectUser::class, 'uuid_user');
+//        return $this->hasMany(\App\Models\ProjectUser::class, 'id_user');
 //    }
 //
     /**
@@ -239,7 +239,7 @@ class User extends BaseModel implements
      **/
     public function logs()
     {
-        return $this->hasMany(\App\Models\UserLog::class, 'uuid_user');
+        return $this->hasMany(\App\Models\UserLog::class, 'id_user');
     }
 
 //    /**
@@ -247,7 +247,7 @@ class User extends BaseModel implements
 //     **/
 //    public function tasks()
 //    {
-//        return $this->hasMany(\App\Models\Task::class, 'uuid_user');
+//        return $this->hasMany(\App\Models\Task::class, 'id_user');
 //    }
 //
 //    /**
@@ -255,6 +255,6 @@ class User extends BaseModel implements
 //     **/
 //    public function organizationUsers()
 //    {
-//        return $this->hasMany(\App\Models\OrganizationUser::class, 'uuid_user');
+//        return $this->hasMany(\App\Models\OrganizationUser::class, 'id_user');
 //    }
 }

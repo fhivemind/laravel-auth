@@ -1,6 +1,6 @@
 [
     {
-        "name": "uuid",
+        "name": "id",
         "dbType": "string",
         "htmlType": "text",
         "validations": null,
