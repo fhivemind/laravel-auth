@@ -33,7 +33,7 @@ class RestfulModel extends Model
      * These attributes (in addition to primary keys) are not allowed to be updated explicitly through
      *  API routes of update and put. They can still be updated internally by Laravel, and your own code.
      *
-     * @var array Attributes to disallow updating through an API update or put
+     * @var array Attributes to disallow updating on the model
      */
     public $immutableAttributes = ['created_at', 'deleted_at'];
 

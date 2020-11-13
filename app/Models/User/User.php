@@ -29,7 +29,12 @@ class User extends BaseModel implements
     /**
      * @var array Relations to load implicitly by Restful controllers
      */
-    public static $itemWith = ['roles', 'status'];
+    public static $itemWith = ['roles'];
+
+    /**
+     * @var array Adds custom resources to model.
+     */
+    protected $appends = ['id_status'];
 
     /**
      * The attributes that are mass assignable.
@@ -45,7 +50,18 @@ class User extends BaseModel implements
         'comment',
         'verification_code',
         'verified_at',
-        'id_country',
+        'id_country'
+    ];
+
+    /**
+     * The attributes to disallow updating through API
+     * 
+     * @var array
+     */
+    public $immutableAttributes = [
+        'verified_at',
+        'updated_at',
+        'created_at',
         'id_user_status'
     ];
 
@@ -58,6 +74,8 @@ class User extends BaseModel implements
         'password',
         'token',
         'token_expires_at',
+        'verification_code',
+        'id_user_status'
     ];
 
     /**
@@ -142,6 +160,21 @@ class User extends BaseModel implements
     public function getRoles()
     {
         return $this->roles()->pluck('name')->toArray();
+    }
+
+    /**
+     * Get User status
+     * 
+     * @return int
+     **/
+    public function getIdStatusAttribute()
+    {
+        $status = $this->status()->pluck('id');
+        if (count($status) == 0) {
+            return null;
+        }
+
+        return $status[0];
     }
 
     /**

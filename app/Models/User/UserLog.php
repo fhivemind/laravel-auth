@@ -40,6 +40,19 @@ class UserLog extends BaseModel
     ];
 
     /**
+     * Attributes to disallow updating through an API update or put
+     * 
+     * @var array
+     */
+    public $immutableAttributes = [
+        'operation',
+        'scope',
+        'description',
+        'created_at',
+        'id_user'
+    ];
+
+    /**
      * Validation rules
      *
      * @var array
