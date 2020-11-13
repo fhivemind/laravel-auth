@@ -1,8 +1,6 @@
 <?php
 
-use App\Models\Referral;
-use App\Models\Role;
-use App\Models\User;
+use App\Models\UserStatus;
 
 class UserStorySeeder extends BaseSeeder
 {
@@ -15,35 +13,35 @@ class UserStorySeeder extends BaseSeeder
 
     public function runFake()
     {
+        // Grab all roles for reference
+        $status = UserStatus::all();
+        
         // Create an admin user
         factory(App\Models\User::class)->create([
             'username' => 'Admin',
-            'email'    => static::ADMIN_CREDENTIALS['email']
+            'email'    => static::ADMIN_CREDENTIALS['email'],
+            'id_user_status' => $status->where('name', '=', 'active')->first()->id
         ]);
 
         // Create regular user
         factory(App\Models\User::class)->create([
             'username' => 'Bob',
-            'email'    => 'bob@bob.com'
+            'email'    => 'bob@bob.com',
+            'id_user_status' => $status->where('name', '=', 'active')->first()->id
         ]);
 
         // Create regular user
         factory(App\Models\User::class)->create([
             'username' => 'Alice',
-            'email'    => 'alice@alice.com'
+            'email'    => 'alice@alice.com',
+            'id_user_status' => $status->where('name', '=', 'inactive')->first()->id
         ]);
 
-        // Grab all roles for reference
-        $users = User::all();
-
-        Referral::firstOrCreate([
-            'user_id' => $users->where('username', '=', 'Admin')->first()->id,
-            'referral_user_id' => $users->where('username', '=', 'Bob')->first()->id,
-        ]);
-        
-        Referral::firstOrCreate([
-            'user_id' => $users->where('username', '=', 'Admin')->first()->id,
-            'referral_user_id' => $users->where('username', '=', 'Alice')->first()->id,
+        // Create banned user
+        factory(App\Models\User::class)->create([
+            'username' => 'Blocked',
+            'email'    => 'blocked@blocked.com',
+            'id_user_status' => $status->where('name', '=', 'blocked')->first()->id
         ]);
     }
 }

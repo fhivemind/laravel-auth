@@ -29,7 +29,7 @@ class User extends BaseModel implements
     /**
      * @var array Relations to load implicitly by Restful controllers
      */
-    public static $itemWith = ['roles'];
+    public static $itemWith = ['roles', 'status'];
 
     /**
      * The attributes that are mass assignable.
@@ -42,9 +42,11 @@ class User extends BaseModel implements
         'first_name',
         'last_name',
         'phone_number',
-        'active',
         'comment',
-        'id_country'
+        'verification_code',
+        'verified_at',
+        'id_country',
+        'id_user_status'
     ];
 
     /**
@@ -64,18 +66,20 @@ class User extends BaseModel implements
      * @var array
      */
     protected $casts = [
-        'id' => 'int',
+        'id' => 'integer',
         'username' => 'string',
         'email' => 'string',
         'first_name' => 'string',
         'last_name' => 'string',
         'phone_number' => 'string',
-        'active' => 'boolean',
         'password' => 'string',
         'token' => 'string',
         'token_expires_at' => 'datetime',
         'comment' => 'string',
-        'id_country' => 'integer'
+        'verification_code' => 'string',
+        'verified_at' => 'datetime',
+        'id_country' => 'integer',
+        'id_user_status' => 'integer'
     ];
 
     /**
@@ -91,14 +95,16 @@ class User extends BaseModel implements
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'phone_number' => 'nullable|string',
-            'active' => 'required|boolean',
             'password' => 'nullable|string',
             'token' => 'nullable|string',
             'token_expires_at' => 'nullable',
             'comment' => 'nullable|string',
+            'verification_code' => 'nullable|string',
+            'verified_at' => 'nullable',
             'created_at' => 'nullable',
             'updated_at' => 'nullable',
-            'id_country' => 'nullable|integer'
+            'id_country' => 'nullable|integer',
+            'id_user_status' => 'nullable|integer'
         ];
     }
 
@@ -193,6 +199,14 @@ class User extends BaseModel implements
     public function getAuthIdentifierName()
     {
         return $this->getKeyName();
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     **/
+    public function status()
+    {
+        return $this->belongsTo(\App\Models\UserStatus::class, 'id_user_status');
     }
 
     /**

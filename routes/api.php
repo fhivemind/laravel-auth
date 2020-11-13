@@ -1,7 +1,6 @@
 <?php
 
 use Dingo\Api\Routing\Router;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,17 +50,9 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         });
 
         /*
-         * Roles
-         */
-        $api->group(['prefix' => 'roles'], function (Router $api) {
-            $api->get('/', 'App\Http\Controllers\RoleController@getAll');
-            $api->get('/{id}', 'App\Http\Controllers\RoleController@get');
-        });
-
-        /*
          * Users
          */
-        $api->group(['prefix' => 'users'], function (Router $api) {
+        $api->group(['prefix' => 'user'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\UserController@get');
             $api->post('/', 'App\Http\Controllers\UserController@post');
@@ -71,9 +62,25 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         });
 
         /*
+         * Status
+         */
+        $api->group(['prefix' => 'user_status'], function (Router $api) {
+            $api->get('/', 'App\Http\Controllers\UserStatusController@getAll');
+            $api->get('/{id}', 'App\Http\Controllers\UserStatusController@get');
+        });
+
+        /*
+         * Roles
+         */
+        $api->group(['prefix' => 'role'], function (Router $api) {
+            $api->get('/', 'App\Http\Controllers\RoleController@getAll');
+            $api->get('/{id}', 'App\Http\Controllers\RoleController@get');
+        });
+
+        /*
          * User Roles
          */
-        $api->group(['prefix' => 'user_roles'], function (Router $api) {
+        $api->group(['prefix' => 'user_role'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserRoleController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\UserRoleController@get');
             $api->post('/', 'App\Http\Controllers\UserRoleController@post');
@@ -85,7 +92,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Logs
          */
-        $api->group(['prefix' => 'user_logs'], function (Router $api) {
+        $api->group(['prefix' => 'user_log'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\UserLogsController@getAll');
             $api->get('/{uuid}', 'App\Http\Controllers\UserLogsController@get');
         });
@@ -93,7 +100,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Referrals
          */
-        $api->group(['prefix' => 'referrals'], function (Router $api) {
+        $api->group(['prefix' => 'referral'], function (Router $api) {
             $api->get('/', 'App\Http\Controllers\ReferralController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\ReferralController@get');
         });
