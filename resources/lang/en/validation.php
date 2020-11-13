@@ -116,6 +116,7 @@ return [
     'unique' => 'The :attribute has already been taken.',
     'uploaded' => 'The :attribute failed to upload.',
     'url' => 'The :attribute format is invalid.',
+    'id' => 'The :attribute must be a valid ID.',
     'uuid' => 'The :attribute must be a valid UUID.',
 
     /*

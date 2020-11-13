@@ -8,28 +8,29 @@ use Illuminate\Database\Eloquent\Model;
 use App\Transformers\BaseTransformer;
 use App\Transformers\RestfulTransformer;
 use App\APIHelpers;
+use Spatie\QueryBuilder\AllowedFilter;
 
 class RestfulModel extends Model
 {
     /**
-     * Every model should have a primary UUID key, which will be returned to API consumers.
+     * Every model should have a primary key, which will be returned to API consumers.
      *
-     * @var string UUID key
+     * @var string ID key
      */
     public $primaryKey = '';
 
     /**
      * @var bool Set to false for UUID keys
      */
-    public $incrementing = false;
+    public $incrementing = true;
 
     /**
      * @var string Set to string for UUID keys
      */
-    protected $keyType = 'string';
+    protected $keyType = 'int';
 
     /**
-     * These attributes (in addition to primary & uuid keys) are not allowed to be updated explicitly through
+     * These attributes (in addition to primary keys) are not allowed to be updated explicitly through
      *  API routes of update and put. They can still be updated internally by Laravel, and your own code.
      *
      * @var array Attributes to disallow updating through an API update or put
@@ -98,7 +99,7 @@ class RestfulModel extends Model
      */
     public function getAllowedFilters()
     {
-        return [$this->primaryKey] + $this->fillable;
+        return [AllowedFilter::exact($this->primaryKey)] + $this->fillable;
     }
 
     /**
@@ -142,9 +143,9 @@ class RestfulModel extends Model
 
         // Add functionality for updating a model
         static::updating(function (self $model) {
-            // Disallow updating UUID keys
+            // Disallow updating ID keys
             if ($model->getAttribute($model->getKeyName()) != $model->getOriginal($model->getKeyName())) {
-                throw new BadRequestHttpException('Updating the UUID of a resource is not allowed.');
+                throw new BadRequestHttpException('Updating the ID of a resource is not allowed.');
             }
 
             // Disallow updating immutable attributes
@@ -170,21 +171,21 @@ class RestfulModel extends Model
     }
 
     /**
-     * When Laravel creates a new model, it will add any new attributes (such as UUID) at the end. When a create
-     * operation such as a POST returns the new resource, the UUID will thus be at the end, which doesn't look nice.
-     * For purely aesthetic reasons, we have this function to conduct a simple reorder operation to move the UUID
+     * When Laravel creates a new model, it will add any new attributes (such as ID) at the end. When a create
+     * operation such as a POST returns the new resource, the ID will thus be at the end, which doesn't look nice.
+     * For purely aesthetic reasons, we have this function to conduct a simple reorder operation to move the ID
      * attribute to the head of the attributes array
      *
      * This will be used at the end of create-related controller functions
      *
      * @return void
      */
-    public function orderAttributesUuidFirst()
+    public function orderAttributesIdFirst()
     {
         if ($this->getKeyName()) {
-            $UuidValue = $this->getKey();
+            $idValue = $this->getKey();
             unset($this->attributes[$this->getKeyName()]);
-            $this->attributes = [$this->getKeyName() => $UuidValue] + $this->attributes;
+            $this->attributes = [$this->getKeyName() => $idValue] + $this->attributes;
         }
     }
 

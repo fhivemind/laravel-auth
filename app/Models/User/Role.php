@@ -11,12 +11,6 @@ class Role extends BaseModel
     public $timestamps = false;
    
     /**
-     * @var string ID key
-     */
-    public $primaryKey = 'id';
-    public $incrementing = true;
-
-    /**
      * Role constants
      */
     public const ROLE_ADMIN = 'admin';

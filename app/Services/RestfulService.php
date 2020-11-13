@@ -49,18 +49,18 @@ class RestfulService
     }
 
     /**
-     * Deletes resources of the given model and uuid(s)
+     * Deletes resources of the given model and id(s)
      *
      * @param $model string Model class name
-     * @param $uuid string|array The UUID(s) of the models to remove
+     * @param $id string|array The ID(s) of the models to remove
      * @return mixed
      */
-    public function delete($model, $uuid)
+    public function delete($model, $id)
     {
-        $deletedCount = $model::destroy($uuid);
+        $deletedCount = $model::destroy($id);
 
         if ($deletedCount < 1) {
-            throw new NotFoundHttpException('Could not find a resource with that UUID to delete');
+            throw new NotFoundHttpException('Could not find a resource with that ID to delete');
         }
 
         return $deletedCount;
@@ -172,7 +172,7 @@ class RestfulService
         $validator = Validator::make($data, $this->getRelevantValidationRules($resource, $data), $resource->getValidationMessages());
 
         if ($validator->fails()) {
-            throw new StoreResourceFailedException('Could not update resource with UUID "'.$resource->getKey().'".', $validator->errors());
+            throw new StoreResourceFailedException('Could not update resource with ID "'.$resource->getKey().'".', $validator->errors());
         }
     }
 

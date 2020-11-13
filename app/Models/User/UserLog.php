@@ -8,6 +8,9 @@ class UserLog extends BaseModel
      * Table configuration
      */
     public $table = 'user_logs';
+    public $primaryKey = 'uuid';
+    public $incrementing = false;
+    protected $keyType = 'string';
     const UPDATED_AT = null;
 
     /**
@@ -28,7 +31,7 @@ class UserLog extends BaseModel
      * @var array
      */
     protected $casts = [
-        'id' => 'int',
+        'uuid' => 'string',
         'operation' => 'string',
         'scope' => 'string',
         'description' => 'string',

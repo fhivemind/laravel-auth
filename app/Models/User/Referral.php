@@ -27,8 +27,8 @@ class Referral extends BaseModel
      */
     protected $casts = [
         'id' => 'int',
-        'user_id' => 'string',
-        'referral_user_id' => 'string'
+        'user_id' => 'int',
+        'referral_user_id' => 'int'
     ];
 
     /**
