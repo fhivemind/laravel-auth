@@ -2,7 +2,7 @@
 
 namespace App\Http\Response\Format;
 
-use App\APIHelpers;
+use App\Helpers;
 
 class Json extends \Dingo\Api\Http\Response\Format\Json
 {
@@ -17,7 +17,7 @@ class Json extends \Dingo\Api\Http\Response\Format\Json
     {
         if (array_key_exists('meta', $content) && is_array($content['meta'])) {
             // Change key-case of meta
-            $content['meta'] = APIHelpers::formatKeyCaseAccordingToResponseFormat($content['meta']);
+            $content['meta'] = Helpers::formatKeyCaseAccordingToResponseFormat($content['meta']);
         }
 
         return parent::formatArray($content);

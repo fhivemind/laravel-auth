@@ -5,7 +5,6 @@ namespace App\Exceptions;
 use Config;
 use Throwable;
 use Dingo\Api\Exception\Handler as ExceptionHandler;
-use App\APIHelpers;
 use App\Helpers;
 
 /**
@@ -48,7 +47,7 @@ class RestfulApiExceptionHandler extends ExceptionHandler
         // Format response object keys
         $updatedFormat = [];
         foreach ($this->format as $key => $value) {
-            $updatedFormat[APIHelpers::formatCaseAccordingToResponseFormat($key)] = $value;
+            $updatedFormat[Helpers::formatCaseAccordingToResponseFormat($key)] = $value;
         }
         $this->format = $updatedFormat;
 
@@ -77,7 +76,7 @@ class RestfulApiExceptionHandler extends ExceptionHandler
         if (array_key_exists($errorKey, $replacements)) {
             $errorMessages = $replacements[$errorKey];
 
-            if (Config(APIHelpers::CASE_TYPE_CONFIG_PATH, APIHelpers::DEFAULT_CASE) == APIHelpers::CAMEL_CASE) {
+            if (Config(Helpers::CASE_TYPE_CONFIG_PATH, Helpers::DEFAULT_CASE) == Helpers::CAMEL_CASE) {
                 $errorMessages = Helpers::camelCaseArrayKeys($errorMessages);
             } else {
                 $errorMessages = Helpers::snakeCaseArrayKeys($errorMessages);

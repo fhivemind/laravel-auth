@@ -3,7 +3,7 @@
 namespace App\Transformers;
 
 use League\Fractal\TransformerAbstract;
-use App\APIHelpers;
+use App\Helpers;
 use App\Models\RestfulModel;
 
 class RestfulTransformer extends TransformerAbstract
@@ -119,7 +119,7 @@ class RestfulTransformer extends TransformerAbstract
         /**
          * Transform all keys to required case, to the specified number of levels (by default, infinite)
          */
-        $transformed = APIHelpers::formatKeyCaseAccordingToResponseFormat($transformed, $levels);
+        $transformed = Helpers::formatKeyCaseAccordingToResponseFormat($transformed, $levels);
 
         /*
          * However, if the level is 1, we also want to transform the first level of keys in a json field which has been cast to array
@@ -128,11 +128,11 @@ class RestfulTransformer extends TransformerAbstract
             // Go through casted atrributes, figuring out what their new key name is to access them
             foreach ($this->model->getCasts() as $fieldName => $castType) {
                 if ($castType == 'array') {
-                    $fieldNameFormatted = APIHelpers::formatKeyCaseAccordingToResponseFormat($fieldName);
+                    $fieldNameFormatted = Helpers::formatKeyCaseAccordingToResponseFormat($fieldName);
 
                     // Transform the keys of the array attribute
                     if (array_key_exists($fieldNameFormatted, $transformed) && ! empty($transformed[$fieldNameFormatted])) {
-                        $transformed[$fieldNameFormatted] = APIHelpers::formatKeyCaseAccordingToResponseFormat($transformed[$fieldNameFormatted]);
+                        $transformed[$fieldNameFormatted] = Helpers::formatKeyCaseAccordingToResponseFormat($transformed[$fieldNameFormatted]);
                     }
                 }
             }
@@ -151,7 +151,7 @@ class RestfulTransformer extends TransformerAbstract
      */
     protected function formatKeyCase($input, $levels = null)
     {
-        return APIHelpers::formatKeyCaseAccordingToResponseFormat($input, $levels);
+        return Helpers::formatKeyCaseAccordingToResponseFormat($input, $levels);
     }
 
     /**
@@ -185,7 +185,7 @@ class RestfulTransformer extends TransformerAbstract
     {
         // Iterate through all relations
         foreach ($this->model->getRelations() as $relationKey => $relation) {
-            $transformedRelationKey = APIHelpers::formatKeyCaseAccordingToResponseFormat($relationKey);
+            $transformedRelationKey = Helpers::formatKeyCaseAccordingToResponseFormat($relationKey);
 
             // Skip Pivot
             if ($relation instanceof \Illuminate\Database\Eloquent\Relations\Pivot) {
