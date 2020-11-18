@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Role;
+use App\Models\Traits\AuthorizedAttributes;
 use Hash;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
@@ -13,14 +14,9 @@ use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 
-class User extends BaseModel implements
-    AuthenticatableContract,
-    AuthorizableContract,
-    CanResetPasswordContract,
-    JWTSubject
+class User extends BaseModel
 {
-    use Authenticatable, Authorizable, CanResetPassword, Notifiable;
-
+    use AuthorizedAttributes;
     /**
      * Table configuration
      */
@@ -32,23 +28,16 @@ class User extends BaseModel implements
     public static $itemWith = ['roles'];
 
     /**
-     * @var array Adds custom resources to model.
-     */
-    protected $appends = ['id_status'];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
     protected $fillable = [
         'username',
-        'email',
         'first_name',
         'last_name',
         'phone_number',
         'comment',
-        'verification_code',
         'verified_at',
         'id_country'
     ];
@@ -58,11 +47,10 @@ class User extends BaseModel implements
      * 
      * @var array
      */
-    public $immutableAttributes = [
+    public $immutable = [
         'verified_at',
         'updated_at',
-        'created_at',
-        'id_user_status'
+        'created_at'
     ];
 
     /**
@@ -74,8 +62,7 @@ class User extends BaseModel implements
         'password',
         'token',
         'token_expires_at',
-        'verification_code',
-        'id_user_status'
+        'verification_code'
     ];
 
     /**
@@ -97,7 +84,7 @@ class User extends BaseModel implements
         'verification_code' => 'string',
         'verified_at' => 'datetime',
         'id_country' => 'integer',
-        'id_user_status' => 'integer'
+        'id_status' => 'integer'
     ];
 
     /**
@@ -109,7 +96,7 @@ class User extends BaseModel implements
     {
         return [
             'username' => 'required|min:3',
-            'email' => 'email|max:255|unique:user',
+            'email' => 'max:255|unique:user,email,'.$this->id,
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'phone_number' => 'nullable|string',
@@ -122,7 +109,7 @@ class User extends BaseModel implements
             'created_at' => 'nullable',
             'updated_at' => 'nullable',
             'id_country' => 'nullable|integer',
-            'id_user_status' => 'nullable|integer'
+            'id_status' => 'nullable|integer'
         ];
     }
 
@@ -167,14 +154,34 @@ class User extends BaseModel implements
      * 
      * @return int
      **/
-    public function getIdStatusAttribute()
+    public function getStatusName()
     {
-        $status = $this->status()->pluck('id');
+        $status = $this->status()->pluck('name')->toArray();
         if (count($status) == 0) {
             return null;
         }
 
         return $status[0];
+    }
+
+    /**
+     * Is this user active?
+     *
+     * @return bool
+     */
+    public function isActive()
+    {
+        return $this->getStatusName() === UserStatus::ACTIVE;
+    }
+
+    /**
+     * Is this user banned?
+     *
+     * @return bool
+     */
+    public function isBanned()
+    {
+        return $this->getStatusName() === UserStatus::BLOCKED;
     }
 
     /**
@@ -188,13 +195,23 @@ class User extends BaseModel implements
     }
 
     /**
-     * Is this user an editor?
+     * Is this user just a regular user?
      *
      * @return bool
      */
-    public function isEditor()
+    public function isRegular()
     {
-        return in_array(Role::ROLE_EDITOR, $this->getRoles());
+        return ! $this->isAdmin();
+    }
+
+    /**
+     * Does this user have specific ability?
+     *
+     * @return bool
+     */
+    public function hasAbility($ability)
+    {
+        return in_array($ability, $this->getRoles());;
     }
 
     /**
@@ -239,7 +256,7 @@ class User extends BaseModel implements
      **/
     public function status()
     {
-        return $this->belongsTo(\App\Models\UserStatus::class, 'id_user_status');
+        return $this->belongsTo(\App\Models\UserStatus::class, 'id_status');
     }
 
     /**
