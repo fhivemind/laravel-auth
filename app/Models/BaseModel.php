@@ -22,9 +22,8 @@ use App\Models\RestfulModel;
  * @var string public $primaryKey - model primary key
  * @var bool public $incrementing - if should use incremental keys
  * @var string protected $keyType - key type (string vs int)
- * @var array public $immutableAttributes - attributes (in addition to primary key) which are not allowed to be updated explicitly
+ * @var array public $immutable - attributes (in addition to primary key) which are not allowed to be updated explicitly
  * @var array public static $itemWith - which relations should model of this entity be returned with
- * @var array public $immutableAttributes - attributes to disallow updating on the model
  * @var array protected $appends - adds custom resources to model
  * @var BaseTransformer public static $transformer - transformer to use for this model
  * 

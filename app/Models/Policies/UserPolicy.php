@@ -2,6 +2,7 @@
 
 namespace App\Models\Policies;
 
+use App\Models\AuthenticatedUser;
 use App\Models\User;
 use App\Models\Role;
 
@@ -13,11 +14,9 @@ class UserPolicy extends BasePolicy
      * @param  \App\Models\User  $user
      * @return mixed
      */
-    public function viewAll(User $user)
+    public function viewAll(AuthenticatedUser $user)
     {
-        if($user->isEditor()) {
-            return true;
-        }
+        //
     }
 
     /**
@@ -27,14 +26,9 @@ class UserPolicy extends BasePolicy
      * @param  \App\Models\User  $model
      * @return mixed
      */
-    public function view(User $user, User $model)
+    public function view(AuthenticatedUser $user, User $model)
     {
-        
         if($user->id === $model->id) {
-            return true;
-        }
-
-        if($user->isEditor()) {
             return true;
         }
     }
@@ -45,7 +39,7 @@ class UserPolicy extends BasePolicy
      * @param  \App\Models\User  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(AuthenticatedUser $user)
     {
         //
     }
@@ -57,13 +51,9 @@ class UserPolicy extends BasePolicy
      * @param  \App\Models\User  $model
      * @return mixed
      */
-    public function update(User $user, User $model)
+    public function update(AuthenticatedUser $user, User $model)
     {
         if($user->id === $model->id) {
-            return true;
-        }
-
-        if($user->isEditor()) {
             return true;
         }
     }
@@ -75,8 +65,18 @@ class UserPolicy extends BasePolicy
      * @param  \App\Models\User  $model
      * @return mixed
      */
-    public function delete(User $user, User $model)
+    public function delete(AuthenticatedUser $user, User $model)
     {
         //
+    }
+
+    public function viewVerificationCode(AuthenticatedUser $user, User $model)
+    {
+        return true;
+    }
+
+    public function remakeComment(AuthenticatedUser $user, User $model)
+    {
+        return false;
     }
 }

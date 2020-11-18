@@ -44,7 +44,7 @@ class UserLog extends BaseModel
      * 
      * @var array
      */
-    public $immutableAttributes = [
+    public $immutable = [
         'operation',
         'scope',
         'description',

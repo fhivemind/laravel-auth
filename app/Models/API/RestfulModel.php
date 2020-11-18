@@ -35,7 +35,7 @@ class RestfulModel extends Model
      *
      * @var array Attributes to disallow updating on the model
      */
-    public $immutableAttributes = ['created_at', 'deleted_at'];
+    public $immutable = ['created_at', 'deleted_at'];
 
     /**
      * What relations should one model of this entity be returned with, from a relevant controller
@@ -149,9 +149,9 @@ class RestfulModel extends Model
             }
 
             // Disallow updating immutable attributes
-            if (! empty($model->immutableAttributes)) {
+            if (! empty($model->immutable)) {
                 // For each immutable attribute, check if they have changed
-                foreach ($model->immutableAttributes as $attributeName) {
+                foreach ($model->immutable as $attributeName) {
                     if ($model->getOriginal($attributeName) != $model->getAttribute($attributeName)) {
                         throw new BadRequestHttpException('Updating the "'. APIHelpers::formatCaseAccordingToResponseFormat($attributeName) .'" attribute is not allowed.');
                     }

@@ -20,28 +20,28 @@ class UserStorySeeder extends BaseSeeder
         factory(App\Models\User::class)->create([
             'username' => 'Admin',
             'email'    => static::ADMIN_CREDENTIALS['email'],
-            'id_user_status' => $status->where('name', '=', 'active')->first()->id
+            'id_status' => $status->where('name', '=', 'active')->first()->id
         ]);
 
         // Create regular user
         factory(App\Models\User::class)->create([
             'username' => 'Bob',
             'email'    => 'bob@bob.com',
-            'id_user_status' => $status->where('name', '=', 'active')->first()->id
+            'id_status' => $status->where('name', '=', 'active')->first()->id
         ]);
 
         // Create regular user
         factory(App\Models\User::class)->create([
             'username' => 'Alice',
             'email'    => 'alice@alice.com',
-            'id_user_status' => $status->where('name', '=', 'inactive')->first()->id
+            'id_status' => $status->where('name', '=', 'inactive')->first()->id
         ]);
 
         // Create banned user
         factory(App\Models\User::class)->create([
             'username' => 'Blocked',
             'email'    => 'blocked@blocked.com',
-            'id_user_status' => $status->where('name', '=', 'blocked')->first()->id
+            'id_status' => $status->where('name', '=', 'blocked')->first()->id
         ]);
     }
 }

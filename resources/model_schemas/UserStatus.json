@@ -37,6 +37,6 @@
     },
     {
         "type": "relation",
-        "relation": "1tm,User,id_user_status"
+        "relation": "1tm,User,id_status"
     }
 ]

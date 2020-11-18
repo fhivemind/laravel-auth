@@ -180,7 +180,7 @@
         "inView": true
     },
     {
-        "name": "id_user_status",
+        "name": "id_status",
         "dbType": "integer,false",
         "htmlType": null,
         "validations": "nullable|integer|nullable|integer",
@@ -197,7 +197,7 @@
     },
     {
         "type": "relation",
-        "relation": "mt1,UserStatus,id_user_status"
+        "relation": "mt1,UserStatus,id_status"
     },
     {
         "type": "relation",

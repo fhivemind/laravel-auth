@@ -14,7 +14,6 @@ class Role extends BaseModel
      * Role constants
      */
     public const ROLE_ADMIN = 'admin';
-    public const ROLE_EDITOR = 'editor';
 
     /**
      * @var array Relations to load implicitly by Restful controllers

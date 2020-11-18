@@ -63,6 +63,6 @@ class UserStatus extends BaseModel
      **/
     public function users()
     {
-        return $this->hasMany(\App\Models\User::class, 'id_user_status');
+        return $this->hasMany(\App\Models\User::class, 'id_status');
     }
 }
