@@ -268,9 +268,9 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Validate the resource data with the updates
         $this->restfulService->validateResourceUpdate($resource, $request->input());
-
+        
         // Patch model
-        $this->restfulService->patch($resource, $request->input());
+        $this->restfulService->persistResource($resource->fill($request->input()));
 
         // Get updated resource
         $resource = $model::with($model::getItemWith())->where($model->getKeyName(), '=', $id)->first();

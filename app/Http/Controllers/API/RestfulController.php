@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\RestfulModel;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use App\Services\RestfulService;
 use Spatie\QueryBuilder\QueryBuilder;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -52,7 +54,7 @@ abstract class RestfulController extends BaseRestfulController
         }
 
         // Create query from request
-        $query = static::requestQuery($request);
+        $query = static::requestQuery($request, $model);
         
         // Validate query
         $this->qualifyCollectionQuery($query);
@@ -85,7 +87,7 @@ abstract class RestfulController extends BaseRestfulController
     public function get($id, Request $request)
     {
         // Create query from request
-        $resource = static::requestQuery($request, [$this->model->getKeyName() => $id])->first();
+        $resource = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $id])->first();
 
         if (! $resource) {
             throw new NotFoundHttpException('Resource \'' . class_basename(static::model()) . '\' with given ID ' . $id . ' not found');
@@ -114,7 +116,7 @@ abstract class RestfulController extends BaseRestfulController
         $resource = $this->restfulService->persistResource(new $model($request->input()));
 
         // Retrieve full model
-        $resource = static::requestQuery($request, [$this->model->getKeyName() => $resource->getKey()])->first();
+        $resource = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $resource->getKey()])->first();
 
         if ($this->shouldTransform()) {
             $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
@@ -134,7 +136,7 @@ abstract class RestfulController extends BaseRestfulController
      */
     public function put(Request $request, $id)
     {
-        $model = static::model()::find($id);
+        $model = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $id])->first();
 
         if (! $model) {
             // Doesn't exist - create
@@ -184,8 +186,7 @@ abstract class RestfulController extends BaseRestfulController
         $this->authorizeUserAction('update', $model);
 
         $this->restfulService->validateResourceUpdate($model, $request->input());
-
-        $this->restfulService->patch($model, $request->input());
+        $this->restfulService->persistResource($model->fill($request->input()));
 
         if ($this->shouldTransform()) {
             $response = $this->response->item($model, $this->getTransformer());
@@ -240,18 +241,15 @@ abstract class RestfulController extends BaseRestfulController
      * @param array $search
      * @return QueryBuilder
      */
-    public static function requestQuery(Request $request, $search = [])
+    public static function requestQuery(Request $request, RestfulModel $model, $search = [])
     {
-        // Initialize model
-        $model = static::makeModel(static::model());
-
         // Create query
         $query = QueryBuilder::for($model::with($model::getItemWith()), $request);
 
         // Append search parameters
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, $model->getAllowedFilters())) {
+                if (in_array($key, $model->getAllowedFields())) {
                     $query->where($key, $value);
                 }
             }
