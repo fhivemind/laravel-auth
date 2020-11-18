@@ -95,7 +95,7 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Form model's with relations for parent query
         $withArray = [];
-        foreach ($model->getAllowedWith() as $modelRelation) {
+        foreach ($this->model->getAllowedWith() as $modelRelation) {
             $withArray[] = $resourceRelationName . '.' . $modelRelation;
         }
 
@@ -132,7 +132,7 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Form model's with relations for parent query
         $withArray = [];
-        foreach ($model->getAllowedWith() as $modelRelation) {
+        foreach ($this->model->getAllowedWith() as $modelRelation) {
             $withArray[] = $resourceRelationName . '.' . $modelRelation;
         }
 

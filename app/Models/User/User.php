@@ -111,7 +111,7 @@ class User extends BaseModel
      *
      * @return array
      */
-    public function getIncludeAttributes()
+    public function getIncludeRelationships()
     {
         return ['logs', 'referrals', 'referred_by'];
     }

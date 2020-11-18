@@ -10,6 +10,15 @@ trait AuthorizedAttributes
     /************************************************************
      * Public interface
      ***********************************************************/
+
+     /**
+      * Optimization attributes
+      */
+    protected $setHidden = true;
+    protected $hiddenOriginal = null;
+    protected $setFillable = true;
+    protected $fillableOriginal = null;
+
     /**
      * Get the hidden attributes for the model. Drops all attributes
      * defined by Policy which current user can see.
@@ -18,13 +27,32 @@ trait AuthorizedAttributes
      */
     public function getHidden()
     {
-        $policy = Gate::getPolicyFor(static::class);
-
-        if (! $policy) {
-            return $this->hidden;
+        // Check if object has been updated, and if so
+        // make sure to update hidden attribute
+        if ($this->isDirty()) {
+            $this->setHidden = true;
         }
 
-        return AttributeGate::getHidden($this, $this->hidden, $policy);
+        // Check if hidden needs reload
+        if ($this->setHidden) {
+
+            // Set default hiddenOriginal if undeclared
+            if(is_null($this->hiddenOriginal)) {
+                $this->hiddenOriginal = $this->hidden;
+            }
+
+            $policy = Gate::getPolicyFor(static::class);
+
+            // Obtain new rules
+            if ($policy) {
+                $this->hidden = AttributeGate::getHidden($this, $this->hiddenOriginal, $policy);
+            }
+
+            // no need to continue updating
+            $this->setHidden = false;
+        }
+
+        return $this->hidden;
     }
 
     /**
@@ -32,15 +60,34 @@ trait AuthorizedAttributes
      *
      * @return array
      */
-    public function getAllowdEditableAttributes()
+    public function getAllowedEditableAttributes()
     {
-        $policy = Gate::getPolicyFor(static::class);
-
-        if (! $policy) {
-            return $this->fillable;
+        // Check if object has been updated, and if so
+        // make sure to update fillable attribute
+        if ($this->isDirty()) {
+            $this->setFillable = true;
         }
 
-        return AttributeGate::getFillable($this, $this->fillable, $policy);
+        // Check if fillable needs reload
+        if ($this->setFillable) {
+
+            // Set default fillableOriginal if undeclared
+            if(is_null($this->fillableOriginal)) {
+                $this->fillableOriginal = $this->fillable;
+            }
+
+            $policy = Gate::getPolicyFor(static::class);
+
+            // Obtain new rules
+            if ($policy) {
+                $this->fillable = AttributeGate::getFillable($this, $this->fillableOriginal, $policy);
+            }
+
+            // no need to continue updating
+            $this->setFillable = false;
+        }
+
+        return $this->fillable;
     }
 
     /**
@@ -50,13 +97,18 @@ trait AuthorizedAttributes
      */
     public function getForbiddenEditableAttributes()
     {
+        // Set default fillableOriginal if undeclared
+        if(is_null($this->fillableOriginal)) {
+            $this->fillableOriginal = $this->fillable;
+        }
+
         $policy = Gate::getPolicyFor(static::class);
 
         if (! $policy) {
             return [];
         }
 
-        return AttributeGate::getFillable($this, $this->fillable, $policy, false);
+        return AttributeGate::getFillable($this, $this->fillableOriginal, $policy, false);
     }
 
     /**

@@ -71,7 +71,7 @@ trait AuthorizedQuery
      * 
      * @var null|array
      */
-    public function getIncludeAttributes() {
+    public function getIncludeRelationships() {
         return [];
     }
 
@@ -139,7 +139,7 @@ trait AuthorizedQuery
     {
         return $this->getQueryableAttributesFor(
             "include", 
-            $this->getIncludeAttributes()
+            $this->getIncludeRelationships()
         );
     }
 

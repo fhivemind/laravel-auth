@@ -18,7 +18,7 @@ use App\Models\RestfulModel;
  * @method public function getSortAttributes() - list of attributes for which the sorting is enabled
  * @method public function getFilterAttributes() - list of attributes for which the filtering is enabled
  * @method public function getSelectAttributes() - list of attributes for which the selecting is enabled
- * @method public function getIncludeAttributes() - list of relationships for which the eager loading is enabled
+ * @method public function getIncludeRelationships() - list of relationships for which the eager loading is enabled
  * @method public function getAppendAttributes() - list of custom allowed attributes that are going to be read from model methods
  * 
  * @var string public $primaryKey - model primary key

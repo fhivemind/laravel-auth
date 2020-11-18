@@ -176,7 +176,7 @@ class RestfulModel extends Model
      * @var null|array
      */
     public function getSortAttributes() {
-        return $this->getAllowdEditableAttributes();
+        return $this->getAllowedEditableAttributes();
     }
 
     /**
@@ -187,7 +187,7 @@ class RestfulModel extends Model
      * @var null|array
      */
     public function getFilterAttributes() {
-        return $this->getAllowdEditableAttributes();
+        return $this->getAllowedEditableAttributes();
     }
 
     /**
@@ -198,7 +198,7 @@ class RestfulModel extends Model
      * @var null|array
      */
     public function getSelectAttributes() {
-        return $this->getAllowdEditableAttributes();
+        return $this->getAllowedEditableAttributes();
     }
 
     /**
@@ -208,7 +208,7 @@ class RestfulModel extends Model
      * 
      * @var null|array
      */
-    public function getIncludeAttributes() {
+    public function getIncludeRelationships() {
         return [];
     }
 
