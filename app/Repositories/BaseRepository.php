@@ -149,7 +149,7 @@ abstract class BaseRepository
     {
         $query = $this->model->newQuery();
 
-        return $query->with($this->model::getItemWith())->find($id, $columns);
+        return $query->with($this->model->getAllowedWith())->find($id, $columns);
     }
 
     /**

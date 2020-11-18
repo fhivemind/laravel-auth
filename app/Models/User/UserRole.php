@@ -10,9 +10,13 @@ class UserRole extends BaseModel
     protected $table = 'user_role';
 
     /**
-     * @var array Relations to load implicitly by Restful controllers
+     * Relations to load implicitly by Restful controllers
+     *
+     * @var null|array
      */
-    public static $itemWith = ['role'];
+    public function getWithRelationships() {
+        return ['role'];
+    }
 
     /**
      * The attributes that are mass assignable.

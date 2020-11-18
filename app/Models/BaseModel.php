@@ -14,16 +14,17 @@ use App\Models\RestfulModel;
  * 
  * @method public function getValidationRules() - validation rules for model creation
  * @method public function getValidationRulesUpdating() - validation rules for model update
- * @method public function getAllowedSorts() - list of attributes for which the sorting is enabled
- * @method public function getAllowedFilters() - list of attributes for which the filtering is enabled
- * @method public function getAllowedFields() - list of attributes for which the selecting is enabled
- * @method public function getAllowedIncludes() - list of method names for which the eager loading is enabled
+ * @method public function getWithRelationships() - list of relationships that the entity will be returned with
+ * @method public function getSortAttributes() - list of attributes for which the sorting is enabled
+ * @method public function getFilterAttributes() - list of attributes for which the filtering is enabled
+ * @method public function getSelectAttributes() - list of attributes for which the selecting is enabled
+ * @method public function getIncludeAttributes() - list of relationships for which the eager loading is enabled
+ * @method public function getAppendAttributes() - list of custom allowed attributes that are going to be read from model methods
  * 
  * @var string public $primaryKey - model primary key
  * @var bool public $incrementing - if should use incremental keys
  * @var string protected $keyType - key type (string vs int)
  * @var array public $immutable - attributes (in addition to primary key) which are not allowed to be updated explicitly
- * @var array public static $itemWith - which relations should model of this entity be returned with
  * @var array protected $appends - adds custom resources to model
  * @var BaseTransformer public static $transformer - transformer to use for this model
  * 
@@ -43,9 +44,4 @@ class BaseModel extends RestfulModel
      * @var array
      */
     protected $hidden = ['laravel_through_key']; 
-
-    /************************************************************
-     * Extending Laravel Functions Below
-     ***********************************************************/
-
 }

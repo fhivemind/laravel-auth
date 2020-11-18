@@ -3,13 +3,16 @@
 namespace App\Models\Traits;
 
 use Gate;
-use Auth;
 use Illuminate\Support\Str;
 
 trait AuthorizedAttributes
 {
+    /************************************************************
+     * Public interface
+     ***********************************************************/
     /**
-     * Get the hidden attributes for the model.
+     * Get the hidden attributes for the model. Drops all attributes
+     * defined by Policy which current user can see.
      *
      * @return array
      */
@@ -25,11 +28,11 @@ trait AuthorizedAttributes
     }
 
     /**
-     * Get the fillable attributes for the model.
+     * Get all fillable attributes that current user can edit.
      *
      * @return array
      */
-    public function getFillable()
+    public function getAllowdEditableAttributes()
     {
         $policy = Gate::getPolicyFor(static::class);
 
@@ -41,6 +44,22 @@ trait AuthorizedAttributes
     }
 
     /**
+     * Get all fillable attributes that current user cannot edit.
+     *
+     * @return array
+     */
+    public function getForbiddenEditableAttributes()
+    {
+        $policy = Gate::getPolicyFor(static::class);
+
+        if (! $policy) {
+            return [];
+        }
+
+        return AttributeGate::getFillable($this, $this->fillable, $policy, false);
+    }
+
+    /**
      * Get the method name for the attribute visibility ability in the model policy.
      *
      * @param  string  $attribute
@@ -48,7 +67,7 @@ trait AuthorizedAttributes
      */
     public function getAttributeViewAbilityMethod($attribute)
     {
-        return 'view'.Str::studly($attribute);
+        return 'view' . Str::studly($attribute);
     }
 
     /**
@@ -59,6 +78,6 @@ trait AuthorizedAttributes
      */
     public function getAttributeUpdateAbilityMethod($attribute)
     {
-        return 'remake'.Str::studly($attribute);
+        return 'edit' . Str::studly($attribute);
     }
 }

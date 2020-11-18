@@ -2,16 +2,20 @@
 
 namespace App\Models;
 
+use App\Exceptions\UnauthorizedHttpException;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Illuminate\Database\Eloquent\Model;
 use App\Transformers\BaseTransformer;
 use App\Transformers\RestfulTransformer;
-use App\APIHelpers;
-use Spatie\QueryBuilder\AllowedFilter;
+use App\Helpers;
+use App\Models\Traits\AuthorizedAttributes;
+use App\Models\Traits\AuthorizedQuery;
 
 class RestfulModel extends Model
 {
+    use AuthorizedAttributes, AuthorizedQuery;
+    
     /**
      * Every model should have a primary key, which will be returned to API consumers.
      *
@@ -36,13 +40,6 @@ class RestfulModel extends Model
      * @var array Attributes to disallow updating on the model
      */
     public $immutable = ['created_at', 'deleted_at'];
-
-    /**
-     * What relations should one model of this entity be returned with, from a relevant controller
-     *
-     * @var null|array
-     */
-    public static $itemWith = [];
 
     /**
      * You can define a custom transformer for a model, if you wish to override the functionality of the Base transformer
@@ -83,46 +80,6 @@ class RestfulModel extends Model
     }
 
     /**
-     * Return list of attributes for which the sorting is enabled.
-     * 
-     * @var array
-     */
-    public function getAllowedSorts()
-    {
-        return [$this->primaryKey] + $this->fillable;
-    }
-
-    /**
-     * Return list of attributes for which the filtering is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedFilters()
-    {
-        return [AllowedFilter::exact($this->primaryKey)] + $this->fillable;
-    }
-
-    /**
-     * Return list of attributes for which the selecting is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedFields()
-    {
-        return [$this->primaryKey] + $this->fillable;
-    }
-
-    /**
-     * Return list of attributes for which the eager loading is enabled.
-     *
-     * @return array
-     */
-    public function getAllowedIncludes()
-    {
-        return [];
-    }
-
-    /**
      * Boot the model
      *
      * Add various functionality in the model lifecycle hooks
@@ -150,10 +107,19 @@ class RestfulModel extends Model
 
             // Disallow updating immutable attributes
             if (! empty($model->immutable)) {
-                // For each immutable attribute, check if they have changed
                 foreach ($model->immutable as $attributeName) {
                     if ($model->getOriginal($attributeName) != $model->getAttribute($attributeName)) {
-                        throw new BadRequestHttpException('Updating the "'. APIHelpers::formatCaseAccordingToResponseFormat($attributeName) .'" attribute is not allowed.');
+                        throw new BadRequestHttpException('Updating the "'. Helpers::formatCaseAccordingToResponseFormat($attributeName) .'" attribute is not allowed.');
+                    }
+                }
+            }
+
+            // Disallow updating unauthorized attributes
+            $nonEditableAttributes = $model->getForbiddenEditableAttributes();
+            if (! empty($nonEditableAttributes)) {
+                foreach ($nonEditableAttributes as $attributeName) {
+                    if ($model->getOriginal($attributeName) != $model->getAttribute($attributeName)) {
+                        throw new UnauthorizedHttpException('Insufficient permission to update "'. Helpers::formatCaseAccordingToResponseFormat($attributeName) .'" attribute.');
                     }
                 }
             }
@@ -189,16 +155,76 @@ class RestfulModel extends Model
         }
     }
 
+    /************************************************************
+     * Authorization policies for rest queries
+     ***********************************************************/
     /**
-     * Get list of eager loads relations.
+     * List of relations that the entity will be returned with
+     * These relations will always be returned with model
      *
-     * @return array
+     * @var null|array
      */
-    public static function getItemWith()
-    {
-        return static::$itemWith;
+    public function getWithRelationships() {
+        return [];
     }
 
+    /**
+     * List of attributes for which sorting is possible through queries
+     * 
+     * Example: ?sort=-name
+     * 
+     * @var null|array
+     */
+    public function getSortAttributes() {
+        return $this->getAllowdEditableAttributes();
+    }
+
+    /**
+     * List of attributes for which filtering is possible through queries
+     *
+     * Example: ?filter[name]=john&filter[email]=gmail
+     * 
+     * @var null|array
+     */
+    public function getFilterAttributes() {
+        return $this->getAllowdEditableAttributes();
+    }
+
+    /**
+     * List of attributes for which selecting is possible through queries
+     *
+     * Example: ?fields[users]=id,name
+     * 
+     * @var null|array
+     */
+    public function getSelectAttributes() {
+        return $this->getAllowdEditableAttributes();
+    }
+
+    /**
+     * List of relations for which loading is possible through queries
+     *
+     * Example: ?include=posts
+     * 
+     * @var null|array
+     */
+    public function getIncludeAttributes() {
+        return [];
+    }
+
+    /**
+     * List of custom attributes that are going to be read from model methods
+     * and appended
+     * 
+     * Implementation: public function getFullnameAttribute() { return "{$this->firstname} {$this->lastname"; }
+     * Example: ?append=fullname
+     * 
+     * @var null|array
+     */
+    public function getAppendAttributes() {
+        return [];
+    }
+    
     /************************************************************
      * Extending Laravel Functions Below
      ***********************************************************/

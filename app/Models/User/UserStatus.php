@@ -20,11 +20,6 @@ class UserStatus extends BaseModel
     public const BLOCKED = 'blocked';
 
     /**
-     * @var array Relations to load implicitly by Restful controllers
-     */
-    public static $itemWith = [];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array

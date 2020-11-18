@@ -12,6 +12,7 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Dingo\Api\Exception\StoreResourceFailedException;
 use App\Models\RestfulModel;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 /**
  * This class contains logic for processing restful requests
@@ -86,6 +87,8 @@ class RestfulService
                 } elseif (Config::get('api.debug') === true) {
                     throw $e;
                 }
+            } else if ($e instanceof HttpException) {
+                throw $e;
             }
 
             // Default HTTP exception to use for storage errors

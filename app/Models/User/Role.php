@@ -16,11 +16,6 @@ class Role extends BaseModel
     public const ROLE_ADMIN = 'admin';
 
     /**
-     * @var array Relations to load implicitly by Restful controllers
-     */
-    public static $itemWith = [];
-
-    /**
      * The attributes that are mass assignable.
      *
      * @var array

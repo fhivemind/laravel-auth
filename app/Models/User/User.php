@@ -3,20 +3,10 @@
 namespace App\Models;
 
 use App\Models\Role;
-use App\Models\Traits\AuthorizedAttributes;
 use Hash;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends BaseModel
-{
-    use AuthorizedAttributes;
+{    
     /**
      * Table configuration
      */
@@ -25,7 +15,9 @@ class User extends BaseModel
     /**
      * @var array Relations to load implicitly by Restful controllers
      */
-    public static $itemWith = ['roles'];
+    public function getWithRelationships() {
+        return ['roles'];
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -39,7 +31,8 @@ class User extends BaseModel
         'phone_number',
         'comment',
         'verified_at',
-        'id_country'
+        'id_country',
+        'id_status'
     ];
 
     /**
@@ -118,7 +111,7 @@ class User extends BaseModel
      *
      * @return array
      */
-    public function getAllowedIncludes()
+    public function getIncludeAttributes()
     {
         return ['logs', 'referrals', 'referred_by'];
     }
@@ -212,43 +205,6 @@ class User extends BaseModel
     public function hasAbility($ability)
     {
         return in_array($ability, $this->getRoles());;
-    }
-
-    /**
-     * For Authentication
-     * Get the identifier that will be stored in the subject claim of the JWT.
-     *
-     * @return mixed
-     */
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    /**
-     * For Authentication
-     * Return a key value array, containing any custom claims to be added to the JWT.
-     *
-     * @return array
-     */
-    public function getJWTCustomClaims()
-    {
-        return [
-            'user' => [
-                'id' => $this->getKey(),
-                'email' => $this->email
-            ],
-        ];
-    }
-
-    /**
-     * Get the name of the unique identifier for the user.
-     *
-     * @return string
-     */
-    public function getAuthIdentifierName()
-    {
-        return $this->getKeyName();
     }
 
     /**

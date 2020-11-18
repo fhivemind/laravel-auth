@@ -70,13 +70,16 @@ class UserPolicy extends BasePolicy
         //
     }
 
-    public function viewVerificationCode(AuthenticatedUser $user, User $model)
+    public function editIdStatus(AuthenticatedUser $user, User $model)
     {
-        return true;
+        return $user->isAdmin();
     }
 
-    public function remakeComment(AuthenticatedUser $user, User $model)
-    {
+    public function withRoles(AuthenticatedUser $user, User $model) {
+        return false;
+    }
+
+    public function sortComment(AuthenticatedUser $user, User $model) {
         return false;
     }
 }
