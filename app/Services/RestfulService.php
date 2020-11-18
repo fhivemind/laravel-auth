@@ -67,43 +67,6 @@ class RestfulService
     }
 
     /**
-     * Patch a resource of the given model, with the given request
-     *
-     * @deprecated Use persistResource() instead
-     * @param RestfulModel $model
-     * @param array $data
-     * @return bool
-     * @throws HttpException
-     */
-    public function patch($model, array $data)
-    {
-        try {
-            $resource = $model->update($data);
-        } catch (\Exception $e) {
-            // Check for QueryException - if so, we may want to display a more meaningful message, or help with
-            // development debugging
-            if ($e instanceof QueryException) {
-                if (stristr($e->getMessage(), 'duplicate')) {
-                    throw new ConflictHttpException('The resource already exists: ' . class_basename($model));
-                } elseif (Config::get('api.debug') === true) {
-                    throw $e;
-                }
-            }
-
-            // Default HTTP exception to use for storage errors
-            $errorMessage = 'Unexpected error trying to store this resource.';
-
-            if (Config::get('api.debug') === true) {
-                $errorMessage .= ' ' . $e->getMessage();
-            }
-
-            throw new UnprocessableEntityHttpException($errorMessage);
-        }
-
-        return $resource;
-    }
-
-    /**
      * Create model in the database
      *
      * @param $model
