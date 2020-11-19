@@ -11,10 +11,10 @@ class UserPolicy extends BasePolicy
     /**
      * Determine whether the user can view any models.
      *
-     * @param  \App\Models\User  $user
+     * @param  AuthenticatedUser  $loggedUser
      * @return mixed
      */
-    public function viewAll(AuthenticatedUser $user)
+    public function viewAll(AuthenticatedUser $loggedUser)
     {
         //
     }
@@ -22,13 +22,13 @@ class UserPolicy extends BasePolicy
     /**
      * Determine whether the user can view the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
+     * @param  AuthenticatedUser  $loggedUser
+     * @param  User  $user
      * @return mixed
      */
-    public function view(AuthenticatedUser $user, User $model)
+    public function view(AuthenticatedUser $loggedUser, User $user)
     {
-        if($user->id === $model->id) {
+        if($loggedUser->id === $user->id) {
             return true;
         }
     }
@@ -36,10 +36,10 @@ class UserPolicy extends BasePolicy
     /**
      * Determine whether the user can create models.
      *
-     * @param  \App\Models\User  $user
+     * @param  AuthenticatedUser  $loggedUser
      * @return mixed
      */
-    public function create(AuthenticatedUser $user)
+    public function create(AuthenticatedUser $loggedUser)
     {
         //
     }
@@ -47,13 +47,13 @@ class UserPolicy extends BasePolicy
     /**
      * Determine whether the user can update the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
+     * @param  AuthenticatedUser  $loggedUser
+     * @param  User  $user
      * @return mixed
      */
-    public function update(AuthenticatedUser $user, User $model)
+    public function update(AuthenticatedUser $loggedUser, User $user)
     {
-        if($user->id === $model->id) {
+        if($loggedUser->id === $user->id) {
             return true;
         }
     }
@@ -61,33 +61,24 @@ class UserPolicy extends BasePolicy
     /**
      * Determine whether the user can delete the model.
      *
-     * @param  \App\Models\User  $user
-     * @param  \App\Models\User  $model
+     * @param  AuthenticatedUser  $loggedUser
+     * @param  User  $user
      * @return mixed
      */
-    public function delete(AuthenticatedUser $user, User $model)
+    public function delete(AuthenticatedUser $loggedUser, User $user)
     {
         //
     }
 
-    public function editIdStatus(AuthenticatedUser $user, User $model)
+    /**
+     * Determine whether the user can update status.
+     *
+     * @param  AuthenticatedUser  $loggedUser
+     * @param  User  $user
+     * @return bool
+     */
+    public function editIdStatus(AuthenticatedUser $loggedUser, User $user)
     {
-        return $user->isAdmin();
-    }
-
-    public function withRoles(AuthenticatedUser $user, User $model) {
-        return false;
-    }
-
-    public function selectComment(AuthenticatedUser $user, User $model) {
-        return false;
-    }
-
-    public function sortId(AuthenticatedUser $user, User $model) {
-        return false;
-    }
-
-    public function includeLogs(AuthenticatedUser $user, User $model) {
-        return false;
+        return $loggedUser->isAdmin();
     }
 }
