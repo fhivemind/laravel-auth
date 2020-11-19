@@ -21,7 +21,6 @@ class AuthenticatedUser extends User implements
     use Authenticatable, Authorizable, CanResetPassword, Notifiable;
 
     /**
-     * For Authentication
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
      * @return mixed
@@ -32,7 +31,6 @@ class AuthenticatedUser extends User implements
     }
 
     /**
-     * For Authentication
      * Return a key value array, containing any custom claims to be added to the JWT.
      *
      * @return array

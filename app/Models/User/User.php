@@ -13,9 +13,11 @@ class User extends BaseModel
     protected $table = 'user';
 
     /**
-     * @var array Relations to load implicitly by Restful controllers
+     * List of eager loading relationships that model supports
+     * 
+     * @var array
      */
-    public function getWithRelationships() {
+    public function getWith() {
         return ['roles'];
     }
 
@@ -28,11 +30,11 @@ class User extends BaseModel
         'username',
         'first_name',
         'last_name',
-        'phone_number',
+        'phone_number', // requires authorization policy
         'comment',
         'verified_at',
         'id_country',
-        'id_status'
+        'id_status'     // requires authorization policy
     ];
 
     /**
@@ -107,13 +109,17 @@ class User extends BaseModel
     }
 
     /**
-     * Return list of attributes for which the eager loading is enabled.
+     * Return list of relationships for which the eager loading is supported.
      *
      * @return array
      */
-    public function getIncludeRelationships()
+    public function getQueryIncludes()
     {
-        return ['logs', 'referrals', 'referred_by'];
+        return [
+            'logs',         // requires authorization policy
+            'referrals',    // requires authorization policy
+            'referred_by'   // requires authorization policy
+        ];
     }
 
     /**

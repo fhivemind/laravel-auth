@@ -60,7 +60,7 @@ trait AuthorizedAttributes
      *
      * @return array
      */
-    public function getAllowedEditableAttributes()
+    public function getAuthorizedEditableAttributes()
     {
         // Check if object has been updated, and if so
         // make sure to update fillable attribute
@@ -112,7 +112,7 @@ trait AuthorizedAttributes
     }
 
     /**
-     * Get the method name for the attribute visibility ability in the model policy.
+     * Get the method name for the attribute view ability in the model policy.
      *
      * @param  string  $attribute
      * @return string
@@ -123,7 +123,7 @@ trait AuthorizedAttributes
     }
 
     /**
-     * Get the model policy ability method name to update an model attribute.
+     * Get the method name for the attribute edit ability in the model policy.
      *
      * @param  string  $attribute
      * @return string

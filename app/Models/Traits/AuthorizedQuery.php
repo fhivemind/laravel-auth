@@ -22,69 +22,85 @@ trait AuthorizedQuery
     protected static $queryAppendAbilityMethod  = "append";
 
     /**
-     * List of relations that the entity will be returned with
-     * These relations will always be returned with model
+     * List of supported relationships that the entity can be returned with.
+     * 
+     * Its counterpart `getAuthorizedQueryWith()` validates which of these 
+     * relationships are visible for the current user.
      *
-     * @var null|array
+     * @return array
      */
-    public function getWithRelationships() {
+    public function getWith() {
         return [];
     }
 
     /**
-     * List of attributes for which sorting is possible through queries
+     * List of attributes for which sorting is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQuerySorts()` validates which of these 
+     * attributes are visible for the current user.
      * 
      * Example: ?sort=-name
      * 
-     * @var null|array
+     * @return array
      */
-    public function getSortAttributes() {
+    public function getQuerySorts() {
         return [];
     }
 
     /**
-     * List of attributes for which filtering is possible through queries
+     * List of attributes for which filtering is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryFilters()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?filter[name]=john&filter[email]=gmail
      * 
-     * @var null|array
+     * @return array
      */
-    public function getFilterAttributes() {
+    public function getQueryFilters() {
         return [];
     }
 
     /**
-     * List of attributes for which selecting is possible through queries
+     * List of attributes for which selecting is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQuerySelects()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?fields[users]=id,name
      * 
-     * @var null|array
+     * @return array
      */
-    public function getSelectAttributes() {
+    public function getQuerySelects() {
         return [];
     }
 
     /**
-     * List of relations for which loading is possible through queries
+     * List of relations for which relationship (eager) loading is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryIncludes()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?include=posts
      * 
-     * @var null|array
+     * @return array
      */
-    public function getIncludeRelationships() {
+    public function getQueryIncludes() {
         return [];
     }
 
     /**
-     * List of custom attributes that are going to be read from model methods
-     * and appended
+     * List of custom attributes for which appending is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryAppends()` validates which of these 
+     * attributes are visible for the current user.
      * 
      * Implementation: public function getFullnameAttribute() { return "{$this->firstname} {$this->lastname"; }
      * Example: ?append=fullname
      * 
-     * @var null|array
+     * @return array
      */
-    public function getAppendAttributes() {
+    public function getQueryAppends() {
         return [];
     }
     
@@ -92,80 +108,80 @@ trait AuthorizedQuery
      * Authorized queries from policy
      ***********************************************************/
     /**
-     * Get list of attributes for which the sorting is allowed
+     * Get list of attributes for which the sorting is allowed for current user.
      * 
      * @var array
      */
-    public function getAllowedSorts()
+    public function getAuthorizedQuerySorts()
     {
         return [$this->primaryKey] + $this->getQueryableAttributesFor(
             "sort", 
-            $this->getSortAttributes()
+            $this->getQuerySorts()
         );
     }
 
     /**
-     * Get list of attributes for which the filtering is allowed
+     * Get list of attributes for which the filtering is allowed for current user.
      *
      * @return array
      */
-    public function getAllowedFilters()
+    public function getAuthorizedQueryFilters()
     {
         return [AllowedFilter::exact($this->primaryKey)] + $this->getQueryableAttributesFor(
             "filter", 
-            $this->getFilterAttributes()
+            $this->getQueryFilters()
         );
     }
 
     /**
-     * Get list of attributes for which the selecting is allowed
+     * Get list of attributes for which the selecting is allowed for current user.
      *
      * @return array
      */
-    public function getAllowedSelects()
+    public function getAuthorizedQuerySelects()
     {
         return [$this->primaryKey] + $this->getQueryableAttributesFor(
             "select", 
-            $this->getSelectAttributes()
+            $this->getQuerySelects()
         );
     }
 
     /**
-     * Get list of relations for which eager loading through queries is allowed
+     * Get list of relationships for which eager loading through queries is allowed for current user.
      *
      * @return array
      */
-    public function getAllowedIncludes()
+    public function getAuthorizedQueryIncludes()
     {
         return $this->getQueryableAttributesFor(
             "include", 
-            $this->getIncludeRelationships()
+            $this->getQueryIncludes()
         );
     }
 
     /**
-     * Get list of custom allowed attributes that are going to be read from model methods
+     * Get list of custom attributes which are allowed for current user. 
      *
      * @return array
      */
-    public function getAllowedAppends()
+    public function getAuthorizedQueryAppends()
     {
         return $this->getQueryableAttributesFor(
             "append", 
-            $this->getAppendAttributes()
+            $this->getQueryAppends()
         );
     }
 
     /**
-     * Get list of eager loads relations.
+     * Get list of eager loading relationships which are allowed for current user.
      *
      * @return array
      */
-    public function getAllowedWith()
+    public function getAuthorizedWith()
     {
         return $this->getQueryableAttributesFor(
             "with", 
-            $this->getWithRelationships()
+            $this->getWith()
         );
     }
 
@@ -174,9 +190,9 @@ trait AuthorizedQuery
      ***********************************************************/
      /**
      * Defines a list of query attributes to method mappings
-     * used to find proper policy method where AbilityMethod is
+     * used to find proper method in model policy.
      * 
-     * @var null|array
+     * @return array
      */
     protected static function queryMappings() {
         return [
@@ -203,7 +219,7 @@ trait AuthorizedQuery
     }
 
     /**
-     * Get all queryable attributes for current user.
+     * Get all queryable attributes of specific type for current user.
      *
      * @param  string  $type
      * @param  array   $fields

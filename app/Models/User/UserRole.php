@@ -14,7 +14,7 @@ class UserRole extends BaseModel
      *
      * @var null|array
      */
-    public function getWithRelationships() {
+    public function getWith() {
         return ['role'];
     }
 

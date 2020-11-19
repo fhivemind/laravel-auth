@@ -87,7 +87,7 @@ abstract class BaseRepository
 
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, $this->model->getAllowedFields())) {
+                if (in_array($key, $this->model->getAuthorizedSelects())) {
                     $query->where($key, $value);
                 }
             }
@@ -149,7 +149,7 @@ abstract class BaseRepository
     {
         $query = $this->model->newQuery();
 
-        return $query->with($this->model->getAllowedWith())->find($id, $columns);
+        return $query->with($this->model->getAuthorizedWith())->find($id, $columns);
     }
 
     /**

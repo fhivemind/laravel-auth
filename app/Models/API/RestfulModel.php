@@ -15,23 +15,6 @@ use App\Models\Traits\AuthorizedQuery;
 class RestfulModel extends Model
 {
     use AuthorizedAttributes, AuthorizedQuery;
-    
-    /**
-     * Every model should have a primary key, which will be returned to API consumers.
-     *
-     * @var string ID key
-     */
-    public $primaryKey = '';
-
-    /**
-     * @var bool Set to false for UUID keys
-     */
-    public $incrementing = true;
-
-    /**
-     * @var string Set to string for UUID keys
-     */
-    protected $keyType = 'int';
 
     /**
      * These attributes (in addition to primary keys) are not allowed to be updated explicitly through
@@ -158,70 +141,87 @@ class RestfulModel extends Model
     /************************************************************
      * Authorization policies for rest queries
      ***********************************************************/
-    /**
-     * List of relations that the entity will be returned with
-     * These relations will always be returned with model
+
+     /**
+     * List of supported relationships that the entity can be returned with.
+     * 
+     * Its counterpart `getAuthorizedWith()` validates which of these 
+     * relationships are visible for the current user.
      *
-     * @var null|array
+     * @return array
      */
-    public function getWithRelationships() {
+    public function getWith() {
         return [];
     }
 
     /**
-     * List of attributes for which sorting is possible through queries
+     * List of attributes for which sorting is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQuerySorts()` validates which of these 
+     * attributes are visible for the current user.
      * 
      * Example: ?sort=-name
      * 
-     * @var null|array
+     * @return array
      */
-    public function getSortAttributes() {
-        return $this->getAllowedEditableAttributes();
+    public function getQuerySorts() {
+        return $this->getAuthorizedEditableAttributes();
     }
 
     /**
-     * List of attributes for which filtering is possible through queries
+     * List of attributes for which filtering is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryFilters()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?filter[name]=john&filter[email]=gmail
      * 
-     * @var null|array
+     * @return array
      */
-    public function getFilterAttributes() {
-        return $this->getAllowedEditableAttributes();
+    public function getQueryFilters() {
+        return $this->getAuthorizedEditableAttributes();
     }
 
     /**
-     * List of attributes for which selecting is possible through queries
+     * List of attributes for which selecting is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQuerySelects()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?fields[users]=id,name
      * 
-     * @var null|array
+     * @return array
      */
-    public function getSelectAttributes() {
-        return $this->getAllowedEditableAttributes();
+    public function getQuerySelects() {
+        return $this->getAuthorizedEditableAttributes();
     }
 
     /**
-     * List of relations for which loading is possible through queries
+     * List of relations for which relationship (eager) loading is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryIncludes()` validates which of these 
+     * attributes are visible for the current user.
      *
      * Example: ?include=posts
      * 
-     * @var null|array
+     * @return array
      */
-    public function getIncludeRelationships() {
+    public function getQueryIncludes() {
         return [];
     }
 
     /**
-     * List of custom attributes that are going to be read from model methods
-     * and appended
+     * List of custom attributes for which appending is supported through queries.
+     * 
+     * Its counterpart `getAuthorizedQueryAppends()` validates which of these 
+     * attributes are visible for the current user.
      * 
      * Implementation: public function getFullnameAttribute() { return "{$this->firstname} {$this->lastname"; }
      * Example: ?append=fullname
      * 
-     * @var null|array
+     * @return array
      */
-    public function getAppendAttributes() {
+    public function getQueryAppends() {
         return [];
     }
     

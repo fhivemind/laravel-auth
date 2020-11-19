@@ -8,7 +8,6 @@ use Gate;
 class AttributeGate
 {
     /**
-     * 
      * Gets all hidden attributes based on model policy.
      * 
      * @param $model Model
@@ -29,7 +28,6 @@ class AttributeGate
     }
 
     /**
-     * 
      * Gets all fillable attributes based on model policy.
      * 
      * @param $model Model
@@ -55,7 +53,6 @@ class AttributeGate
     }
 
     /**
-     * 
      * Gets all query attributes based on model policy.
      * 
      * @param $model Model

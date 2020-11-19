@@ -95,7 +95,7 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Form model's with relations for parent query
         $withArray = [];
-        foreach ($this->model->getAllowedWith() as $modelRelation) {
+        foreach ($this->model->getAuthorizedWith() as $modelRelation) {
             $withArray[] = $resourceRelationName . '.' . $modelRelation;
         }
 
@@ -132,7 +132,7 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Form model's with relations for parent query
         $withArray = [];
-        foreach ($this->model->getAllowedWith() as $modelRelation) {
+        foreach ($this->model->getAuthorizedWith() as $modelRelation) {
             $withArray[] = $resourceRelationName . '.' . $modelRelation;
         }
 
@@ -171,7 +171,7 @@ abstract class RestfulChildController extends BaseRestfulController
 
         // Get resource
         $model = $this->model;
-        $resource = $model::with($model->getAllowedWith())->where($model->getKeyName(), '=', $id)->firstOrFail();
+        $resource = $model::with($model->getAuthorizedWith())->where($model->getKeyName(), '=', $id)->firstOrFail();
 
         // Check resource belongs to parent
         if ($resource->getAttribute(($parentResource->getKeyName())) != $parentResource->getKey()) {
@@ -225,7 +225,7 @@ abstract class RestfulChildController extends BaseRestfulController
         $resource = $this->restfulService->persistResource($resource);
 
         // Retrieve full model
-        $resource = $model::with($model->getAllowedWith())->where($model->getKeyName(), '=', $resource->getKey())->first();
+        $resource = $model::with($model->getAuthorizedWith())->where($model->getKeyName(), '=', $resource->getKey())->first();
 
         if ($this->shouldTransform()) {
             $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
@@ -273,7 +273,7 @@ abstract class RestfulChildController extends BaseRestfulController
         $this->restfulService->persistResource($resource->fill($request->input()));
 
         // Get updated resource
-        $resource = $model::with($model->getAllowedWith())->where($model->getKeyName(), '=', $id)->first();
+        $resource = $model::with($model->getAuthorizedWith())->where($model->getKeyName(), '=', $id)->first();
 
         if ($this->shouldTransform()) {
             $response = $this->response->item($resource, $this->getTransformer());

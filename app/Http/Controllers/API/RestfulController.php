@@ -47,7 +47,7 @@ abstract class RestfulController extends BaseRestfulController
         // Only allowed for empty request
         if (static::$cacheAll && count($request->all()) === 0) {
             return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model) {
-                $query = QueryBuilder::for($model::with($model->getAllowedWith()));
+                $query = QueryBuilder::for($model::with($model->getAuthorizedWith()));
 
                 return $query->get();
             }), $this->getTransformer());
@@ -147,7 +147,7 @@ abstract class RestfulController extends BaseRestfulController
             $this->restfulService->validateResource($model, $request->input());
             $resource = $this->restfulService->persistResource(new $model($request->input()));
 
-            $resource->loadMissing($model->getAllowedWith());
+            $resource->loadMissing($model->getAuthorizedWith());
 
             if ($this->shouldTransform()) {
                 $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
@@ -244,11 +244,11 @@ abstract class RestfulController extends BaseRestfulController
     public static function requestQuery(Request $request, RestfulModel $model, $search = [])
     {
         // Create query
-        $query = QueryBuilder::for($model::with($model->getAllowedWith()), $request);
+        $query = QueryBuilder::for($model::with($model->getAuthorizedWith()), $request);
 
         // Append search parameters
         if (count($search)) {
-            $res = $model->getAllowedSelects();
+            $res = $model->getAuthorizedQuerySelects();
             foreach($search as $key => $value) {
                 if (in_array($key, $res)) {
                     $query->where($key, $value);
@@ -257,13 +257,13 @@ abstract class RestfulController extends BaseRestfulController
         }
 
         // Append request data
-        $filters = $model->getAllowedFilters();
+        $filters = $model->getAuthorizedQueryFilters();
         $query = $query
             ->allowedFilters($filters)
-            ->allowedSorts($model->getAllowedSorts())
-            ->allowedFields($model->getAllowedSelects())
-            ->allowedIncludes($model->getAllowedIncludes())
-            ->allowedAppends($model->getAllowedAppends());
+            ->allowedSorts($model->getAuthorizedQuerySorts())
+            ->allowedFields($model->getAuthorizedQuerySelects())
+            ->allowedIncludes($model->getAuthorizedQueryIncludes())
+            ->allowedAppends($model->getAuthorizedQueryAppends());
 
         return $query;
     }

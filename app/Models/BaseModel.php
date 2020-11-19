@@ -6,7 +6,7 @@ use App\Models\RestfulModel;
 
 /**
  * 
- * Implements BaseModel.
+ * Implements RestfulModel.
  * 
  * 
  * The model natively supports following methods which allow
@@ -14,30 +14,32 @@ use App\Models\RestfulModel;
  * 
  * @method public function getValidationRules() - validation rules for model creation
  * @method public function getValidationRulesUpdating() - validation rules for model update
- * @method public function getWithRelationships() - list of relationships that the entity will be returned with
- * @method public function getSortAttributes() - list of attributes for which the sorting is enabled
- * @method public function getFilterAttributes() - list of attributes for which the filtering is enabled
- * @method public function getSelectAttributes() - list of attributes for which the selecting is enabled
- * @method public function getIncludeRelationships() - list of relationships for which the eager loading is enabled
- * @method public function getAppendAttributes() - list of custom allowed attributes that are going to be read from model methods
+ * @method public function getWith() - list of eager loading relationships that model supports
+ * @method public function getQuerySorts() - list of attributes for which the sorting via query is supported
+ * @method public function getQueryFilters() - list of attributes for which the filtering via query is supported
+ * @method public function getQuerySelects() - list of attributes for which the selecting via query is supported
+ * @method public function getQueryIncludes() - list of relationships for which the eager loading via query is supported
+ * @method public function getQueryAppends() - list of supported custom query attributes
  * 
- * @var string public $primaryKey - model primary key
- * @var bool public $incrementing - if should use incremental keys
- * @var string protected $keyType - key type (string vs int)
- * @var array public $immutable - attributes (in addition to primary key) which are not allowed to be updated explicitly
- * @var array protected $appends - adds custom resources to model
- * @var BaseTransformer public static $transformer - transformer to use for this model
+ * @method public function getAuthorizedEditableAttributes() - list of attributes current user can mass edit (fillables)
+ * @method public function getAuthorizedWith() - list of eager loading relationships allowed for current user
+ * @method public function getAuthorizedQuerySorts() - list of sorting attributes allowed for current user
+ * @method public function getAuthorizedQueryFilters() - list of filtering attributes allowed for current user
+ * @method public function getAuthorizedQuerySelects() - list of selecting attributes allowed for current user
+ * @method public function getAuthorizedQueryIncludes() - list of eager loading relationships allowed for current user
+ * @method public function getAuthorizedQueryAppends() - list of custom query attributes allowed for current user
+ * 
+ * @var array public $immutable - attributes (in addition to primary key) which are not allowed to be explicitly updated
+ * @var BaseTransformer public static $transformer - transformer to use for the model
+ * 
+ * Please note that it is possible to write Policy authorization methods for hidden and mass assignable attributes, which
+ * should start with prefixes 'view' and 'edit' respectively. The logic is defined under @var AuthorizedAttributes.
+ * 
+ * It is also possible to write Policy authorization methods for query attributes, as defined in @var AuthorizedQuery.
  * 
  */
 class BaseModel extends RestfulModel
 {
-    /**
-     * Every model should have a primary ID key, which will be returned to API consumers.
-     *
-     * @var string ID key
-     */
-    public $primaryKey = 'id';
-
     /**
      * The attributes that should be hidden for arrays and API output
      *
