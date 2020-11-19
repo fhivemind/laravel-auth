@@ -17,7 +17,7 @@ use App\Models\RestfulModel;
  * @method public function getWith() - list of eager loading relationships that model supports
  * @method public function getQuerySorts() - list of attributes for which the sorting via query is supported
  * @method public function getQueryFilters() - list of attributes for which the filtering via query is supported
- * @method public function getQuerySelects() - list of attributes for which the selecting via query is supported
+ * @method public function getQueryFields() - list of attributes for which the selecting via query is supported
  * @method public function getQueryIncludes() - list of relationships for which the eager loading via query is supported
  * @method public function getQueryAppends() - list of supported custom query attributes
  * 
@@ -25,7 +25,7 @@ use App\Models\RestfulModel;
  * @method public function getAuthorizedWith() - list of eager loading relationships allowed for current user
  * @method public function getAuthorizedQuerySorts() - list of sorting attributes allowed for current user
  * @method public function getAuthorizedQueryFilters() - list of filtering attributes allowed for current user
- * @method public function getAuthorizedQuerySelects() - list of selecting attributes allowed for current user
+ * @method public function getAuthorizedQueryFields() - list of selecting attributes allowed for current user
  * @method public function getAuthorizedQueryIncludes() - list of eager loading relationships allowed for current user
  * @method public function getAuthorizedQueryAppends() - list of custom query attributes allowed for current user
  * 

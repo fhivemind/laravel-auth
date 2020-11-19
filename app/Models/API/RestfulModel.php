@@ -185,14 +185,14 @@ class RestfulModel extends Model
     /**
      * List of attributes for which selecting is supported through queries.
      * 
-     * Its counterpart `getAuthorizedQuerySelects()` validates which of these 
+     * Its counterpart `getAuthorizedQueryFields()` validates which of these 
      * attributes are visible for the current user.
      *
      * Example: ?fields[users]=id,name
      * 
      * @return array
      */
-    public function getQuerySelects() {
+    public function getQueryFields() {
         return $this->getAuthorizedEditableAttributes();
     }
 

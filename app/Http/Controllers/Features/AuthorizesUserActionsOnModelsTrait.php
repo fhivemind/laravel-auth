@@ -6,6 +6,7 @@ use App\Models\RestfulModel;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Spatie\QueryBuilder\AllowedFilter;
 use Spatie\QueryBuilder\QueryBuilderRequest;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -66,6 +67,7 @@ trait AuthorizesUserActionsOnModelsTrait
                 )
                 {
                     static::checkQueryAuthorizationFromParams(
+                        $type,
                         $request->{strtolower($type)}(),
                         $model->{"getQuery" . ucfirst(strtolower($type))}(),
                         $model->{"getAuthorizedQuery" . ucfirst(strtolower($type))}()
@@ -77,16 +79,37 @@ trait AuthorizesUserActionsOnModelsTrait
 
     /**
      * Check if query params contain any accessible elements but for which the user lacks authorization.
-     *
+     * TODO: this is a bit dirty
+     * 
      * @param Collection $params
      * @param array $accessible
      * @param array $authorized
      * 
      * @throws AccessDeniedHttpException
      */
-    public static function checkQueryAuthorizationFromParams(Collection $params, $accessible, $authorized)
+    public static function checkQueryAuthorizationFromParams($type, Collection $params, array $accessible, array $authorized)
     {
-        if ($items = $params->intersect($accessible)->diff($authorized))
+        // Find all requested unauthorized params
+        if($type === "filters") {
+            // map filter collections as they are not all strings
+            $remap = function ($filter) {
+                if ($filter instanceof AllowedFilter) {
+                    return $filter->getName();
+                }
+                return $filter;
+            };
+
+            $params = $params
+                        ->map($remap)
+                        ->intersect(collect($accessible)->map($remap))
+                        ->diff(collect($authorized)->map($remap));
+        } else {
+            // otherwise, if the collections are only strings, use them
+            $params = $params->intersect($accessible)->diff($authorized);
+        }
+
+        // Check if any unauthorized params requested
+        if ($params->count())
         {
             throw new AccessDeniedHttpException('Unauthorized action. You do not have permission to request \''. $items->join(",") .'\' field.');
         }

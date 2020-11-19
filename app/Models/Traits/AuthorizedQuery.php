@@ -15,7 +15,7 @@ trait AuthorizedQuery
      * List of method prefix name for the attribute query ability in the model policy.
      */
     protected static $queryWithAbilityMethod    = "with";
-    protected static $querySelectAbilityMethod  = "select";
+    protected static $queryFieldAbilityMethod  = "field";
     protected static $queryFilterAbilityMethod  = "filter";
     protected static $querySortAbilityMethod    = "sort";
     protected static $queryIncludeAbilityMethod = "include";
@@ -64,14 +64,14 @@ trait AuthorizedQuery
     /**
      * List of attributes for which selecting is supported through queries.
      * 
-     * Its counterpart `getAuthorizedQuerySelects()` validates which of these 
+     * Its counterpart `getAuthorizedQueryFields()` validates which of these 
      * attributes are visible for the current user.
      *
      * Example: ?fields[users]=id,name
      * 
      * @return array
      */
-    public function getQuerySelects() {
+    public function getQueryFields() {
         return [];
     }
 
@@ -138,11 +138,11 @@ trait AuthorizedQuery
      *
      * @return array
      */
-    public function getAuthorizedQuerySelects()
+    public function getAuthorizedQueryFields()
     {
         return [$this->primaryKey] + $this->getQueryableAttributesFor(
-            "select", 
-            $this->getQuerySelects()
+            "field", 
+            $this->getQueryFields()
         );
     }
 
@@ -199,7 +199,7 @@ trait AuthorizedQuery
             "with"    => static::$queryWithAbilityMethod,
             "sort"    => static::$querySortAbilityMethod,
             "filter"  => static::$queryFilterAbilityMethod,
-            "select"  => static::$querySelectAbilityMethod,
+            "field"   => static::$queryFieldAbilityMethod,
             "include" => static::$queryIncludeAbilityMethod,
             "append"  => static::$queryAppendAbilityMethod,
         ];
@@ -219,7 +219,7 @@ trait AuthorizedQuery
         "with"    => [true, null],
         "sort"    => [true, null],
         "filter"  => [true, null],
-        "select"  => [true, null],
+        "field"   => [true, null],
         "include" => [true, null],
         "append"  => [true, null],
     ];

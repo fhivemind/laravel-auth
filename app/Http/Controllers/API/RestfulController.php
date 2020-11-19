@@ -278,7 +278,7 @@ abstract class RestfulController extends BaseRestfulController
 
             // Append search parameters
             if (count($search)) {
-                $queryAttrs = $model->getAuthorizedQuerySelects();
+                $queryAttrs = $model->getAuthorizedQueryFields();
                 foreach($search as $key => $value) {
                     if (in_array($key, $queryAttrs)) {
                         $query->where($key, $value);
@@ -290,11 +290,10 @@ abstract class RestfulController extends BaseRestfulController
             $query = $query
                 ->allowedFilters($model->getAuthorizedQueryFilters())
                 ->allowedSorts($model->getAuthorizedQuerySorts())
-                ->allowedFields($model->getAuthorizedQuerySelects())
+                ->allowedFields($model->getAuthorizedQueryFields())
                 ->allowedIncludes($model->getAuthorizedQueryIncludes())
                 ->allowedAppends($model->getAuthorizedQueryAppends());
 
-            // Authorize
             return $query;
         }
 
