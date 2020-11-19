@@ -17,7 +17,7 @@ trait AuthorizedAttributes
     protected $setHidden = true;
     protected $hiddenOriginal = null;
     protected $setFillable = true;
-    protected $fillableOriginal = null;
+    protected $authorizedFillable = [];
 
     /**
      * Get the hidden attributes for the model. Drops all attributes
@@ -56,59 +56,69 @@ trait AuthorizedAttributes
     }
 
     /**
-     * Get all fillable attributes that current user can edit.
+     * Get the fillable attributes for the model.
      *
      * @return array
      */
-    public function getAuthorizedEditableAttributes()
+    public function getFillable()
+    {
+        return $this->getAuthorizedEditableAttributes();
+    }
+
+    /**
+     * Get all fillable attributes that current user can edit.
+     *
+     * This method caches results unless the model has updated,
+     * or `$forceUpdate = true` flag was passed.
+     * 
+     * @param bool $forceUpdate force permission reverification
+     * 
+     * @return array
+     */
+    public function getAuthorizedEditableAttributes($forceUpdate = false)
     {
         // Check if object has been updated, and if so
-        // make sure to update fillable attribute
+        // make sure to update related attribute
         if ($this->isDirty()) {
             $this->setFillable = true;
         }
 
-        // Check if fillable needs reload
-        if ($this->setFillable) {
-
-            // Set default fillableOriginal if undeclared
-            if(is_null($this->fillableOriginal)) {
-                $this->fillableOriginal = $this->fillable;
-            }
+        // Check if fillable needs reload (or initialization)
+        if ($this->setFillable || $forceUpdate) {
 
             $policy = Gate::getPolicyFor(static::class);
 
             // Obtain new rules
             if ($policy) {
-                $this->fillable = AttributeGate::getFillable($this, $this->fillableOriginal, $policy);
+                $this->authorizedFillable = AttributeGate::getFillable($this, $this->fillable, $policy);
+            } else {
+                $this->authorizedFillable = $this->fillable;
             }
 
             // no need to continue updating
             $this->setFillable = false;
         }
 
-        return $this->fillable;
+        return $this->authorizedFillable;
     }
 
     /**
      * Get all fillable attributes that current user cannot edit.
      *
+     * For Forbidden attributes, we don't want to cache results,
+     * but verify the permissions each time this is requested.
+     * 
      * @return array
      */
     public function getForbiddenEditableAttributes()
     {
-        // Set default fillableOriginal if undeclared
-        if(is_null($this->fillableOriginal)) {
-            $this->fillableOriginal = $this->fillable;
-        }
-
         $policy = Gate::getPolicyFor(static::class);
 
         if (! $policy) {
             return [];
         }
 
-        return AttributeGate::getFillable($this, $this->fillableOriginal, $policy, false);
+        return AttributeGate::getFillable($this, $this->fillable, $policy, false);
     }
 
     /**

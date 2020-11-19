@@ -13,25 +13,25 @@ use App\Helpers;
 abstract class RestfulChildController extends BaseRestfulController
 {
     /**
-    * @var \App\Repositories\BaseRepository
+    * @var \App\Services\RestfulService|null
     */
     protected $parentRepository = null;
 
     /**
-     *  @var \Illuminate\Database\Eloquent\Model
+     *  @var \App\Models\RestfulModel|null
      */
     protected $parentModel = null;
 
     /**
-     * Specify the parent repository that you want to be associated with this controller. This is the parent repository of the
-     * primary repository the controller deals with
+     * Specify the parent repository that should be associated with this controller. This is the parent repository of the
+     * primary repository the controller deals with.
      *
      * @return string
      */
     abstract public static function parentRepository();
 
     /**
-     * Returns parent model associated with this Controller based on its parent repository.
+     * Returns parent model associated with this Controller (parent repository).
      * 
      * @return string
      */
@@ -69,8 +69,8 @@ abstract class RestfulChildController extends BaseRestfulController
         'create'    => 'update',
         'view'      => 'view',
         'viewAll'   => 'view',
-        'update'    => 'own',
-        'delete'    => 'own',
+        'update'    => 'update',
+        'delete'    => 'delete',
     ];
 
     /**

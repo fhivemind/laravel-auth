@@ -10,39 +10,40 @@ use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Dingo\Api\Routing\Helpers;
-use Illuminate\Database\Eloquent\Model;
+use App\Http\Controllers\Features\RestfulControllerTrait;
+use App\Http\Controllers\Features\AuthorizesUserActionsOnModelsTrait;
+use App\Models\RestfulModel;
 
 abstract class BaseRestfulController extends Controller
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
     use Helpers;
-    use Features\RestfulControllerTrait;
-    use Features\AuthorizesUserActionsOnModelsTrait;
+    use RestfulControllerTrait, AuthorizesUserActionsOnModelsTrait;
 
     /**
-     * @var \App\Services\RestfulService
+     * @var RestfulService
      */
     protected $restfulService = null;
 
     /**
-     *  @var \App\Repositories\BaseRepository
+     *  @var BaseRepository|null
      */
     protected $repository = null;
 
     /**
-     *  @var \Illuminate\Database\Eloquent\Model
+     *  @var RestfulModel
      */
     protected $model = null;
 
     /**
-     * Specify the repository that you want to be associated with this controller.
+     * Specify the repository that should be associated with this controller.
      *
      * @return string
      */
     abstract public static function repository();
 
     /**
-     * Returns model associated with this Controller based on its repository.
+     * Returns model associated with this Controller (repository).
      * 
      * @return string|null
      */
@@ -80,7 +81,7 @@ abstract class BaseRestfulController extends Controller
      * @param string $name
      * @throws \Exception
      *
-     * @return \Illuminate\Database\Eloquent\Model;|null
+     * @return RestfulModel|null
      */
     public static function makeModel($name)
     {
@@ -89,8 +90,8 @@ abstract class BaseRestfulController extends Controller
         }
 
         $model = new $name;
-        if (!$model instanceof Model) {
-            throw new \Exception("Class {$name} must be an instance of Illuminate\\Database\\Eloquent\\Model");
+        if (!$model instanceof RestfulModel) {
+            throw new \Exception("Class {$name} must be an instance of App\\Models\\RestfulModel");
         }
 
         return $model;
@@ -102,7 +103,7 @@ abstract class BaseRestfulController extends Controller
      * @param string $name
      * @throws \Exception
      *
-     * @return \App\Repositories\BaseRepository|null
+     * @return BaseRepository|null
      */
     public static function makeRepository($name)
     {

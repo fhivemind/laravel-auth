@@ -8,19 +8,21 @@ use Illuminate\Database\Eloquent\Model;
  * 
  * Implements BaseRepository.
  * 
- * 
  * Controls the way how the model is being handled on a DB level. 
  * This injects the DB logic into the model.
  * 
  * Serves as a bridge between model and controller.
  * 
- * @method public static function model()  returns model the repository controls
+ * The authorization logic should be handled preferably before this.
+ * However, it is possible to do so inside the repository as well.
+ * 
+ * It operates with underlying Eloquent Model.
  * 
  */
 abstract class BaseRepository
 {
     /**
-     * @var \App\Models\BaseModel
+     * @var \App\Models\RestfulModel
      */
     protected $model = null;
 
@@ -60,20 +62,6 @@ abstract class BaseRepository
     }
 
     /**
-     * Paginate records for scaffold.
-     *
-     * @param int $perPage
-     * @param array $columns
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
-     */
-    public function paginate($perPage, $columns = ['*'])
-    {
-        $query = $this->allQuery();
-
-        return $query->paginate($perPage, $columns);
-    }
-
-    /**
      * Build a query for retrieving all records.
      *
      * @param array $search
@@ -81,13 +69,13 @@ abstract class BaseRepository
      * @param int|null $limit
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function allQuery($search = [], $skip = null, $limit = null)
+    public function allQuery($search = [], $relations = [], $skip = null, $limit = null)
     {
-        $query = $this->model->newQuery();
+        $query = $this->newQuery($relations);
 
         if (count($search)) {
             foreach($search as $key => $value) {
-                if (in_array($key, $this->model->getAuthorizedSelects())) {
+                if (in_array($key, $this->model->getAttributes())) {
                     $query->where($key, $value);
                 }
             }
@@ -114,7 +102,7 @@ abstract class BaseRepository
      *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection
      */
-    public function all($search = [], $skip = null, $limit = null, $columns = ['*'])
+    public function all($search = [], $skip = null, $limit = null, $columns = ['*'], $relations = [])
     {
         $query = $this->allQuery($search, $skip, $limit);
 
@@ -142,14 +130,15 @@ abstract class BaseRepository
      *
      * @param int $id
      * @param array $columns
+     * @param array $relations
      *
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Eloquent\Builder[]|\Illuminate\Database\Eloquent\Collection|Model|null
      */
-    public function find($id, $columns = ['*'])
+    public function find($id, $columns = ['*'], $relations = [])
     {
-        $query = $this->model->newQuery();
+        $query = $this->newQuery($relations);
 
-        return $query->with($this->model->getAuthorizedWith())->find($id, $columns);
+        return $query->find($id, $columns);
     }
 
     /**
@@ -162,7 +151,7 @@ abstract class BaseRepository
      */
     public function update($input, $id)
     {
-        $query = $this->model->newQuery();
+        $query = $this->newQuery();
 
         $model = $query->findOrFail($id);
 
@@ -182,10 +171,22 @@ abstract class BaseRepository
      */
     public function delete($id)
     {
-        $query = $this->model->newQuery();
+        $query = $this->newQuery();
 
         $model = $query->findOrFail($id);
 
         return $model->delete();
+    }
+
+    /**
+     * Creates a query for current model.
+     *
+     * @param array $relations
+     * 
+     * @return Query
+     */
+    public function newQuery($relations = [])
+    {
+        return $this->model->newQuery()->with($relations);
     }
 }

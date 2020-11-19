@@ -206,6 +206,25 @@ trait AuthorizedQuery
     }
 
      /**
+     * Optimization data.
+     * 
+     * @var array
+     * @var bool array[TYPE][0] - reload authorization data, if set to true, it will force 
+     * `getAuthorizedQueryTYPE` to reload authorized fields from policy
+     * @var bool array[TYPE][1] - authorized fields
+     * 
+     * @return array
+     */
+    protected $queryData = [
+        "with"    => [true, null],
+        "sort"    => [true, null],
+        "filter"  => [true, null],
+        "select"  => [true, null],
+        "include" => [true, null],
+        "append"  => [true, null],
+    ];
+    
+     /**
      * Get the method name for the attribute query ability in the model policy.
      *
      * @param  string  $type
@@ -214,25 +233,41 @@ trait AuthorizedQuery
      */
     public function getAttributeQueryAbilityMethodFor($type, $attribute)
     {
-        $res = static::queryMappings()[$type] . Str::studly($attribute);
-        return $res;
+        return static::queryMappings()[$type] . Str::studly($attribute);
     }
 
     /**
      * Get all queryable attributes of specific type for current user.
+     * TODO: this looks a bit dirty
      *
      * @param  string  $type
      * @param  array   $fields
      * @return array
      */
-    public function getQueryableAttributesFor($type, $fields)
+    public function getQueryableAttributesFor($type, $fields, $forceUpdate = false)
     {
-        $policy = Gate::getPolicyFor(static::class);
-
-        if (! $policy) {
-            return $fields;
+        // Check if object has been updated, and if so
+        // make sure to update related attribute
+        if ($this->isDirty()) {
+            $this->queryData[$type][0] = true;
         }
 
-        return AttributeGate::getQueryable($this, $type, $fields, $policy);
+        // Check if reload needed (or initialization)
+        if ($this->queryData[$type][0] || $forceUpdate) {
+
+            $policy = Gate::getPolicyFor(static::class);
+
+            // Obtain new rules
+            if ($policy) {
+                $this->queryData[$type][1] = AttributeGate::getQueryable($this, $type, $fields, $policy);
+            } else {
+                $this->queryData[$type][1] = $fields;
+            }
+
+            // no need to continue updating
+            $this->queryData[$type][0] = false;
+        }
+
+        return $this->queryData[$type][1];
     }
 }

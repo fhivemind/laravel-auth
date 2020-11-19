@@ -2,20 +2,24 @@
 
 namespace App\Http\Controllers\Features;
 
+use App\Models\RestfulModel;
 use Gate;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Spatie\QueryBuilder\QueryBuilderRequest;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 /**
  * Trait AuthorizesUsersActionsAgainstModelsTrait
  *
  * These are wrappers for Illuminate\Foundation\Auth\Access\Authorizable from the perspective of a RESTful controller
- * authorizing the access of authenticated users on a given resource model
+ * authorizing the access of authenticated users on a given resource model.
  */
 trait AuthorizesUserActionsOnModelsTrait
 {
     /**
      * Shorthand function which checks the currently logged in user against an action for the controller's model,
-     * and throws a 403 if unauthorized
+     * and throws a 403 if unauthorized.
      *
      * Only checks if a policy exists for that model.
      *
@@ -36,8 +40,61 @@ trait AuthorizesUserActionsOnModelsTrait
     }
 
     /**
+     * Shorthand function which validates request parameters of currently logged user,
+     * and throws a 403 if the request contains unauthorized fields.
+     *
+     * @param Request $request
+     * @param RestfulModel $model
+     * @throws AccessDeniedHttpException
+     */
+    public static function authorizeUserRequestOnModel(Request $request, RestfulModel $model)
+    {
+        $modelPolicy = Gate::getPolicyFor($model);
+
+        // If policy exists for this model, then check
+        if ($modelPolicy)
+        {
+            $request = QueryBuilderRequest::fromRequest($request);
+
+            // verify for each request type
+            foreach (["includes", "appends", "filters", "sorts", "fields"] as $type) {
+
+                // does the model contain this specific type
+                if( is_callable([$request, strtolower($type)]) && 
+                    is_callable([$model, "getQuery" . ucfirst(strtolower($type))]) &&
+                    is_callable([$model, "getAuthorizedQuery" . ucfirst(strtolower($type))])
+                )
+                {
+                    static::checkQueryAuthorizationFromParams(
+                        $request->{strtolower($type)}(),
+                        $model->{"getQuery" . ucfirst(strtolower($type))}(),
+                        $model->{"getAuthorizedQuery" . ucfirst(strtolower($type))}()
+                    );
+                }
+            }
+        }
+    }
+
+    /**
+     * Check if query params contain any accessible elements but for which the user lacks authorization.
+     *
+     * @param Collection $params
+     * @param array $accessible
+     * @param array $authorized
+     * 
+     * @throws AccessDeniedHttpException
+     */
+    public static function checkQueryAuthorizationFromParams(Collection $params, $accessible, $authorized)
+    {
+        if ($items = $params->intersect($accessible)->diff($authorized))
+        {
+            throw new AccessDeniedHttpException('Unauthorized action. You do not have permission to request \''. $items->join(",") .'\' field.');
+        }
+    }
+
+    /**
      * This function can be used to add conditions to the query builder,
-     * which will specify the currently logged in user's ownership of the model
+     * which will specify the currently logged in user's ownership of the model.
      *
      * @param \Illuminate\Database\Eloquent\Builder $query
      * @return \Illuminate\Database\Eloquent\Builder|null
@@ -95,7 +152,7 @@ trait AuthorizesUserActionsOnModelsTrait
         }
 
         // Check if the authenticated user has the required ability for the model
-        if ($user->can($ability, $arguments)) {
+        if (Gate::forUser($user)->allows($ability, $arguments)) {
             return true;
         }
 

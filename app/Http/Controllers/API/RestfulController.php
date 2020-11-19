@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\RestfulModel;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use App\Services\RestfulService;
 use Spatie\QueryBuilder\QueryBuilder;
+use Spatie\QueryBuilder\QueryBuilderRequest;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Cache;
@@ -43,7 +43,7 @@ abstract class RestfulController extends BaseRestfulController
 
         $model = $this->model;
 
-        // If we are caching the endpont, do a simple get all resources
+        // If we are caching the endpoint, do a simple get all resources
         // Only allowed for empty request
         if (static::$cacheAll && count($request->all()) === 0) {
             return $this->response->collection(Cache::remember(static::getCacheKey(), static::$cacheExpiresIn, function () use ($model) {
@@ -54,7 +54,7 @@ abstract class RestfulController extends BaseRestfulController
         }
 
         // Create query from request
-        $query = static::requestQuery($request, $model);
+        $query = static::newQueryFromRequest($request, $model);
         
         // Validate query
         $this->qualifyCollectionQuery($query);
@@ -87,15 +87,15 @@ abstract class RestfulController extends BaseRestfulController
     public function get($id, Request $request)
     {
         // Create query from request
-        $resource = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $id])->first();
+        $model = $this->getModelByIdFromRequest($id, $request);
 
-        if (! $resource) {
+        if (! $model) {
             throw new NotFoundHttpException('Resource \'' . class_basename(static::model()) . '\' with given ID ' . $id . ' not found');
         }
 
-        $this->authorizeUserAction('view', $resource);
+        $this->authorizeUserAction('view', $model);
 
-        return $this->response->item($resource, $this->getTransformer());
+        return $this->response->item($model, $this->getTransformer());
     }
 
     /**
@@ -115,16 +115,9 @@ abstract class RestfulController extends BaseRestfulController
 
         $resource = $this->restfulService->persistResource(new $model($request->input()));
 
-        // Retrieve full model
-        $resource = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $resource->getKey()])->first();
+        $resource = static::reloadModelFromRequest($resource, $request);
 
-        if ($this->shouldTransform()) {
-            $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
-        } else {
-            $response = $resource;
-        }
-
-        return $response;
+        return $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
     }
 
     /**
@@ -136,39 +129,15 @@ abstract class RestfulController extends BaseRestfulController
      */
     public function put(Request $request, $id)
     {
-        $model = static::requestQuery($request, $this->model, [$this->model->getKeyName() => $id])->first();
+        $model = static::model()::find($id);
 
         if (! $model) {
             // Doesn't exist - create
-            $this->authorizeUserAction('create');
-
-            $model = $this->model;
-
-            $this->restfulService->validateResource($model, $request->input());
-            $resource = $this->restfulService->persistResource(new $model($request->input()));
-
-            $resource->loadMissing($model->getAuthorizedWith());
-
-            if ($this->shouldTransform()) {
-                $response = $this->response->item($resource, $this->getTransformer())->setStatusCode(201);
-            } else {
-                $response = $resource;
-            }
+            return $this->post($request);
         } else {
-            // Exists - replace
-            $this->authorizeUserAction('update', $model);
-
-            $this->restfulService->validateResourceUpdate($model, $request->input());
-            $this->restfulService->persistResource($model->fill($request->input()));
-
-            if ($this->shouldTransform()) {
-                $response = $this->response->item($model, $this->getTransformer())->setStatusCode(200);
-            } else {
-                $response = $model;
-            }
+            // Exists - update
+            return $this->update($model, $request);
         }
-
-        return $response;
     }
 
     /**
@@ -182,19 +151,31 @@ abstract class RestfulController extends BaseRestfulController
     public function patch($id, Request $request)
     {
         $model = static::model()::findOrFail($id);
+        
+        // delegate to update function
+        return $this->update($model, $request);
+    }
 
+    /**
+     * Internally update a specified resource. We delegate calls to this function
+     * as we don't want to copy same code multiple times for PUT and PATCH.
+     *
+     * @param model $model model to update
+     * @param Request $request
+     * @return \Dingo\Api\Http\Response
+     * @throws HttpException
+     */
+    protected function update($model, Request $request)
+    {
         $this->authorizeUserAction('update', $model);
 
         $this->restfulService->validateResourceUpdate($model, $request->input());
-        $this->restfulService->persistResource($model->fill($request->input()));
 
-        if ($this->shouldTransform()) {
-            $response = $this->response->item($model, $this->getTransformer());
-        } else {
-            $response = $model;
-        }
+        $resource = $this->restfulService->persistResource($model->fill($request->input()));
 
-        return $response;
+        $resource = static::reloadModelFromRequest($resource, $request);
+
+        return $this->response->item($resource, $this->getTransformer())->setStatusCode(200);
     }
 
     /**
@@ -235,36 +216,89 @@ abstract class RestfulController extends BaseRestfulController
     }
 
     /**
-     * Builds a query based on provided Request and search parameters.
+     * Retrieves model from db based on request. Uses authorized data in request.
+     * Supports advanced query configuration via requests.
+     *
+     * @param string $id
+     * @param Request $request
+     * 
+     * @throws Exception
+     * @return Model
+     */
+    public function getModelByIdFromRequest($id, Request $request) {
+        return static::newQueryFromRequest($request, $this->model, [$this->model->getKeyName() => $id])->first();
+    }
+
+    /**
+     * Processes an edited version of a model if the request asks so.
+     * If the request is empty, returns passed object to avoid duplicating calls
+     * to obtain same data.
+     *
+     * @param Model $model
+     * @param Request $request
+     * 
+     * @throws Exception
+     * @return Model
+     */
+    public static function reloadModelFromRequest(RestfulModel $model, Request $request) {
+        // don't trigger extra db call if request not asking for it
+        if (count($request->all()) === 0)
+            return $model;
+
+        // otherwise, get model from request
+        return static::newQueryFromRequest($request, $model, [$model->getKeyName() => $model->getKey()])->first();
+    }
+
+    /**
+     * Returns a query for a model based on provided Request and search parameters.
+     * In case of RestfulModel, the query will also add additional fields such as filtering, selecting...
      *
      * @param Request $request
+     * @param Model $model
      * @param array $search
+     * 
+     * @throws Exception
      * @return QueryBuilder
      */
-    public static function requestQuery(Request $request, RestfulModel $model, $search = [])
+    public static function newQueryFromRequest(Request $request, $model, $search = [], $relations = [])
     {
-        // Create query
-        $query = QueryBuilder::for($model::with($model->getAuthorizedWith()), $request);
+        // Handle RestfulModel logic
+        if ($model instanceof RestfulModel) {
 
-        // Append search parameters
-        if (count($search)) {
-            $res = $model->getAuthorizedQuerySelects();
-            foreach($search as $key => $value) {
-                if (in_array($key, $res)) {
-                    $query->where($key, $value);
+            // Authorize query
+            static::authorizeUserRequestOnModel($request, $model);
+
+            // Check relations
+            if (empty($relations)) {
+                $relations = $model->getAuthorizedWith();
+            }
+        
+            // Create query
+            $query = QueryBuilder::for($model::with($relations), $request);
+
+            // Append search parameters
+            if (count($search)) {
+                $queryAttrs = $model->getAuthorizedQuerySelects();
+                foreach($search as $key => $value) {
+                    if (in_array($key, $queryAttrs)) {
+                        $query->where($key, $value);
+                    }
                 }
             }
+
+            // Add allowed request parameters
+            $query = $query
+                ->allowedFilters($model->getAuthorizedQueryFilters())
+                ->allowedSorts($model->getAuthorizedQuerySorts())
+                ->allowedFields($model->getAuthorizedQuerySelects())
+                ->allowedIncludes($model->getAuthorizedQueryIncludes())
+                ->allowedAppends($model->getAuthorizedQueryAppends());
+
+            // Authorize
+            return $query;
         }
 
-        // Append request data
-        $filters = $model->getAuthorizedQueryFilters();
-        $query = $query
-            ->allowedFilters($filters)
-            ->allowedSorts($model->getAuthorizedQuerySorts())
-            ->allowedFields($model->getAuthorizedQuerySelects())
-            ->allowedIncludes($model->getAuthorizedQueryIncludes())
-            ->allowedAppends($model->getAuthorizedQueryAppends());
-
-        return $query;
+        // otherwise, generate default query builder
+        return QueryBuilder::for($model::with($relations), $request);
     }
 }

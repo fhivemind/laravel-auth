@@ -79,7 +79,15 @@ class UserPolicy extends BasePolicy
         return false;
     }
 
-    public function sortComment(AuthenticatedUser $user, User $model) {
+    public function selectComment(AuthenticatedUser $user, User $model) {
+        return false;
+    }
+
+    public function sortId(AuthenticatedUser $user, User $model) {
+        return false;
+    }
+
+    public function includeLogs(AuthenticatedUser $user, User $model) {
         return false;
     }
 }

@@ -31,7 +31,7 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
  *      > "getAll" => "viewAll",          \
  *      > "get"    => "view",             \
  *      > "post"   => "create",           \
- *      > "put"    => "create,update",    \
+ *      > "put"    => "create|update",    \
  *      > "patch"  => "update",           \
  *      > "delete" => "delete"
  * 
