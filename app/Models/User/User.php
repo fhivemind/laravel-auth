@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Role;
 use Hash;
+use App\Enums\UserStatus as Status;
 
 class User extends BaseModel
 {    
@@ -30,6 +31,7 @@ class User extends BaseModel
         'username',
         'first_name',
         'last_name',
+        'email',
         'phone_number', // requires authorization policy
         'comment',
         'verified_at',
@@ -91,7 +93,7 @@ class User extends BaseModel
     {
         return [
             'username' => 'required|min:3',
-            'email' => 'max:255|unique:user,email,'.$this->id,
+            'email' => 'required|max:255|unique:user,email,'.$this->id,
             'first_name' => 'nullable|string',
             'last_name' => 'nullable|string',
             'phone_number' => 'nullable|string',
@@ -155,12 +157,7 @@ class User extends BaseModel
      **/
     public function getStatusName()
     {
-        $status = $this->status()->pluck('name')->toArray();
-        if (count($status) == 0) {
-            return null;
-        }
-
-        return $status[0];
+        return $this->status()->value('name');
     }
 
     /**
@@ -170,7 +167,7 @@ class User extends BaseModel
      */
     public function isActive()
     {
-        return $this->getStatusName() === UserStatus::ACTIVE;
+        return $this->getStatusName() === Status::Active;
     }
 
     /**
@@ -180,7 +177,7 @@ class User extends BaseModel
      */
     public function isBanned()
     {
-        return $this->getStatusName() === UserStatus::BLOCKED;
+        return $this->getStatusName() === Status::Blocked;
     }
 
     /**

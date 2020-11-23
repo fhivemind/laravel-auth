@@ -28,9 +28,12 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
      * Authentication
      */
     $api->group(['prefix' => 'auth'], function (Router $api) {
-        $api->group(['prefix' => 'jwt'], function (Router $api) {
-            $api->get('/token', 'App\Http\Controllers\Auth\AuthController@token');
-        });
+        $api->get('/login', 'App\Http\Controllers\Auth\AuthController@token');
+        $api->post('/register', 'App\Http\Controllers\Auth\AuthController@register');
+
+        // TODO: Implement endpoints
+        // $api->post('/reset/{mail}', 'App\Http\Controllers\Auth\AuthController@reset');
+        // $api->post('/verify/{verification_code}', 'App\Http\Controllers\Auth\AuthController@verify');
     });
 
     /*
@@ -41,11 +44,11 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
          * Authentication
          */
         $api->group(['prefix' => 'auth'], function (Router $api) {
-            $api->group(['prefix' => 'jwt'], function (Router $api) {
+            $api->group(['prefix' => 'token'], function (Router $api) {
                 $api->get('/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
-                $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
             });
 
+            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
             $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser');
         });
 

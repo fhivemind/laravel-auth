@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Eloquent as Model;
+use App\Enums\UserStatus as EnumsUserStatus;
 
 class UserStatus extends BaseModel
 {
@@ -11,13 +11,6 @@ class UserStatus extends BaseModel
      */
     public $table = 'user_status';
     public $timestamps = false;
-
-    /**
-     * Status constants
-     */
-    public const ACTIVE = 'active';
-    public const INACTIVE = 'inactive';
-    public const BLOCKED = 'blocked';
 
     /**
      * The attributes that are mass assignable.
@@ -59,5 +52,9 @@ class UserStatus extends BaseModel
     public function users()
     {
         return $this->hasMany(\App\Models\User::class, 'id_status');
+    }
+
+    public static function getStatusId(EnumsUserStatus $status) {
+        return UserStatus::where("name", $status->value)->value('id');
     }
 }
