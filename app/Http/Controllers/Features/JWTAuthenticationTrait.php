@@ -26,10 +26,10 @@ trait JWTAuthenticationTrait
         // Get credentials
         $credentials = base64_decode(trim(substr($authHeader, 5)));
 
-        [$login, $password] = explode(':', $credentials, 2);
+        [$email, $password] = explode(':', $credentials, 2);
 
         // Do auth
-        if (! $token = auth()->attempt(['email' => $login, 'password' => $password])) {
+        if (! $token = auth()->attempt(['email' => $email, 'password' => $password])) {
             throw new UnauthorizedHttpException('Unauthorized login');
         }
 
@@ -65,7 +65,7 @@ trait JWTAuthenticationTrait
      */
     public function getUser()
     {
-        return $this->api->raw()->get('users/' . $this->auth->user()->getKey());
+        return $this->api->raw()->get('user/' . $this->auth->user()->getKey());
     }
 
     /**
