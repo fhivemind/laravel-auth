@@ -66,7 +66,7 @@ class AttributeGate
     public static function getQueryable(Model $model, $type, $fields, $policy, $mode = true)
     {
         return array_values(array_filter($fields, function ($attribute) use ($model, $policy, $type, $mode) {
-            $ability = $model->getAttributeQueryAbilityMethodFor($type, $attribute);
+            $ability = $model->getAbilityMethodFor($type, $attribute);
 
             if (is_callable([$policy, $ability])) {
                 return $mode ? 

@@ -288,11 +288,11 @@ abstract class RestfulController extends BaseRestfulController
 
             // Add allowed request parameters
             $query = $query
+                ->allowedAppends($model->getAuthorizedQueryAppends())
                 ->allowedFilters($model->getAuthorizedQueryFilters())
                 ->allowedSorts($model->getAuthorizedQuerySorts())
                 ->allowedFields($model->getAuthorizedQueryFields())
-                ->allowedIncludes($model->getAuthorizedQueryIncludes())
-                ->allowedAppends($model->getAuthorizedQueryAppends());
+                ->allowedIncludes($model->getAuthorizedQueryIncludes());
 
             return $query;
         }

@@ -2,9 +2,11 @@
 
 namespace App\Models\Traits;
 
+use App\Enums\SpatieQuery;
 use Illuminate\Support\Str;
 use Spatie\QueryBuilder\AllowedFilter;
 use Gate;
+use stdClass;
 
 trait AuthorizedQuery
 {
@@ -13,13 +15,29 @@ trait AuthorizedQuery
      ***********************************************************/
     /**
      * List of method prefix name for the attribute query ability in the model policy.
+     * 
+     * Naming:  %s_POLICY_PREFIX
+     * 
      */
-    protected static $queryWithAbilityMethod    = "with";
-    protected static $queryFieldAbilityMethod  = "field";
-    protected static $queryFilterAbilityMethod  = "filter";
-    protected static $querySortAbilityMethod    = "sort";
-    protected static $queryIncludeAbilityMethod = "include";
-    protected static $queryAppendAbilityMethod  = "append";
+    public static $WITH_POLICY_PREFIX    = "with";
+    public static $FIELD_POLICY_PREFIX   = "field";
+    public static $FILTER_POLICY_PREFIX  = "filter";
+    public static $SORT_POLICY_PREFIX    = "sort";
+    public static $INCLUDE_POLICY_PREFIX = "include";
+    public static $APPEND_POLICY_PREFIX  = "append";
+
+    /**
+     * List of query method identifiers. This should never be changed!
+     * 
+     * Naming: %s_METHOD
+     * 
+     */
+    protected static $WITH_METHOD    = "with";
+    protected static $FIELD_METHOD   = "fields";
+    protected static $FILTER_METHOD  = "filters";
+    protected static $SORT_METHOD    = "sorts";
+    protected static $INCLUDE_METHOD = "includes";
+    protected static $APPEND_METHOD  = "appends";
 
     /**
      * List of supported relationships that the entity can be returned with.
@@ -106,6 +124,11 @@ trait AuthorizedQuery
     
     /************************************************************
      * Authorized queries from policy
+     * TODO: refactor to support relation related activities:
+     * TODO: filtering, selecting, eager loading
+     * 
+     * TODO: note that DOT notation is used to differ from 
+     * TODO: model and relation requests
      ***********************************************************/
     /**
      * Get list of attributes for which the sorting is allowed for current user.
@@ -115,7 +138,7 @@ trait AuthorizedQuery
     public function getAuthorizedQuerySorts()
     {
         return [$this->primaryKey] + $this->getQueryableAttributesFor(
-            "sort", 
+            static::$SORT_METHOD, 
             $this->getQuerySorts()
         );
     }
@@ -123,12 +146,14 @@ trait AuthorizedQuery
     /**
      * Get list of attributes for which the filtering is allowed for current user.
      *
+     * TODO: Support relation filtering, e.g. /user?includes=logs&filter[logs.scope]=ADMIN
+     * 
      * @return array
      */
     public function getAuthorizedQueryFilters()
     {
         return [AllowedFilter::exact($this->primaryKey)] + $this->getQueryableAttributesFor(
-            "filter", 
+            static::$FILTER_METHOD, 
             $this->getQueryFilters()
         );
     }
@@ -136,12 +161,20 @@ trait AuthorizedQuery
     /**
      * Get list of attributes for which the selecting is allowed for current user.
      *
+     * TODO: Support relation selection, e.g. user/includes=logs&fields[logs]=scope
+     * 
      * @return array
      */
     public function getAuthorizedQueryFields()
     {
+        // // find relation object policy and merge with query
+        // foreach($this->getAuthorizedQueryIncludes() as $relation) {
+        //     $related = get_class($this->{Str::camel($relation)}()->getRelated());
+        //     var_dump($related);
+        // }
+
         return [$this->primaryKey] + $this->getQueryableAttributesFor(
-            "field", 
+            static::$FIELD_METHOD, 
             $this->getQueryFields()
         );
     }
@@ -154,7 +187,7 @@ trait AuthorizedQuery
     public function getAuthorizedQueryIncludes()
     {
         return $this->getQueryableAttributesFor(
-            "include", 
+            static::$INCLUDE_METHOD, 
             $this->getQueryIncludes()
         );
     }
@@ -167,20 +200,22 @@ trait AuthorizedQuery
     public function getAuthorizedQueryAppends()
     {
         return $this->getQueryableAttributesFor(
-            "append", 
+            static::$APPEND_METHOD, 
             $this->getQueryAppends()
         );
     }
 
     /**
      * Get list of eager loading relationships which are allowed for current user.
-     *
+     * 
+     * TODO: Drop relations when user specifically requesting via fields, e.g. /user?fields[user]=id,name
+     * 
      * @return array
      */
     public function getAuthorizedWith()
     {
         return $this->getQueryableAttributesFor(
-            "with", 
+            static::$WITH_METHOD, 
             $this->getWith()
         );
     }
@@ -192,17 +227,63 @@ trait AuthorizedQuery
      * Defines a list of query attributes to method mappings
      * used to find proper method in model policy.
      * 
+     * This maps the type of query to policy method prefixes.
+     * 
      * @return array
      */
-    protected static function queryMappings() {
+    protected static function getPolicyMappings() {
         return [
-            "with"    => static::$queryWithAbilityMethod,
-            "sort"    => static::$querySortAbilityMethod,
-            "filter"  => static::$queryFilterAbilityMethod,
-            "field"   => static::$queryFieldAbilityMethod,
-            "include" => static::$queryIncludeAbilityMethod,
-            "append"  => static::$queryAppendAbilityMethod,
+            static::$WITH_METHOD    => static::$WITH_POLICY_PREFIX,
+            static::$SORT_METHOD    => static::$SORT_POLICY_PREFIX,
+            static::$FILTER_METHOD  => static::$FILTER_POLICY_PREFIX,
+            static::$FIELD_METHOD   => static::$FIELD_POLICY_PREFIX,
+            static::$INCLUDE_METHOD => static::$INCLUDE_POLICY_PREFIX,
+            static::$APPEND_METHOD  => static::$APPEND_POLICY_PREFIX,
         ];
+    }
+
+     /**
+     * Returns a list of all query key method names.
+     * Keys represent @var QueryBuilderRequest public function names,
+     * and values their matching base AuthorizedQuery method identifiers.
+     * 
+     * This maps SpatieQuery to ATTR parts defined via
+     * `getQueryATTR` or `getAuthorizedQueryATTR`.
+     * 
+     * @return array
+     */
+    public static function getSpatieIdentifierMappings() {
+        return [
+            SpatieQuery::Sort    => static::$SORT_METHOD,
+            SpatieQuery::Filter  => static::$FILTER_METHOD,
+            SpatieQuery::Field   => static::$FIELD_METHOD,
+            SpatieQuery::Include => static::$INCLUDE_METHOD,
+            SpatieQuery::Append  => static::$APPEND_METHOD,
+        ];
+    }
+
+    /**
+     * Helper function that returns matching `getQuery` method name for Spatie request query.
+     * Spatie query can be any value defined as keys under getSpatieIdentifierMappings.
+     * 
+     * @var SpatieQuery $field Spatie request field name
+     * 
+     * @return string
+     */
+    public static function getQueryMethodForSpatie(SpatieQuery $field) {
+        return "getQuery" . ucfirst(strtolower(static::getSpatieIdentifierMappings()[$field->value]));
+    }
+
+    /**
+     * Helper function that returns matching `getAuthorizedQuery` method name for Spatie request field.
+     * Spatie query can be any value defined as keys under getSpatieIdentifierMappings.
+     * 
+     * @var SpatieQuery $field Spatie request field name
+     * 
+     * @return string
+     */
+    public static function getAuthorizedQueryMethodForSpatie(SpatieQuery $field) {
+        return "getAuthorizedQuery" . ucfirst(strtolower(static::getSpatieIdentifierMappings()[$field->value]));
     }
 
      /**
@@ -215,14 +296,7 @@ trait AuthorizedQuery
      * 
      * @return array
      */
-    protected $queryData = [
-        "with"    => [true, null],
-        "sort"    => [true, null],
-        "filter"  => [true, null],
-        "field"   => [true, null],
-        "include" => [true, null],
-        "append"  => [true, null],
-    ];
+    protected $queryData = array();
     
      /**
      * Get the method name for the attribute query ability in the model policy.
@@ -231,43 +305,55 @@ trait AuthorizedQuery
      * @param  string  $attribute
      * @return string
      */
-    public function getAttributeQueryAbilityMethodFor($type, $attribute)
+    public function getAbilityMethodFor($type, $attribute)
     {
-        return static::queryMappings()[$type] . Str::studly($attribute);
+        return static::getPolicyMappings()[$type] . Str::studly($attribute);
     }
 
     /**
      * Get all queryable attributes of specific type for current user.
-     * TODO: this looks a bit dirty
      *
      * @param  string  $type
      * @param  array   $fields
      * @return array
      */
-    public function getQueryableAttributesFor($type, $fields, $forceUpdate = false)
+    public function getQueryableAttributesFor(string $type, array $fields, bool $forceUpdate = false)
     {
-        // Check if object has been updated, and if so
-        // make sure to update related attribute
-        if ($this->isDirty()) {
-            $this->queryData[$type][0] = true;
+        // The key is undefined, return empty list.
+        if(! array_key_exists($type, static::getPolicyMappings()))
+        {
+            return [];
+        }
+        // Key is valid, but the data is uninitialized.
+        else if(! array_key_exists($type, $this->queryData)) 
+        {
+            $this->queryData[$type] = new stdClass;
+            $this->queryData[$type]->update = true;
+            $this->queryData[$type]->data = array();
+        }
+        // Key exists and is initialized, but the object was 
+        // updated recently. Ensure that the data is refreshed.
+        else if ($this->isDirty())
+        {
+            $this->queryData[$type]->update = true;
         }
 
         // Check if reload needed (or initialization)
-        if ($this->queryData[$type][0] || $forceUpdate) {
+        if ($this->queryData[$type]->update || $forceUpdate) {
 
             $policy = Gate::getPolicyFor(static::class);
 
             // Obtain new rules
             if ($policy) {
-                $this->queryData[$type][1] = AttributeGate::getQueryable($this, $type, $fields, $policy);
+                $this->queryData[$type]->data = AttributeGate::getQueryable($this, $type, $fields, $policy);
             } else {
-                $this->queryData[$type][1] = $fields;
+                $this->queryData[$type]->data = $fields;
             }
 
             // no need to continue updating
-            $this->queryData[$type][0] = false;
+            $this->queryData[$type]->update = false;
         }
 
-        return $this->queryData[$type][1];
+        return $this->queryData[$type]->data;
     }
 }

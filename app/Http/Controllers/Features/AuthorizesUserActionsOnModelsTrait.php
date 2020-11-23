@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Features;
 
+use App\Enums\SpatieQuery;
 use App\Models\RestfulModel;
+use App\Models\Traits\AuthorizedQuery;
 use Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -58,19 +60,21 @@ trait AuthorizesUserActionsOnModelsTrait
             $request = QueryBuilderRequest::fromRequest($request);
 
             // verify for each request type
-            foreach (["includes", "appends", "filters", "sorts", "fields"] as $type) {
+            foreach (SpatieQuery::getValues() as $value) 
+            {
+                $type = SpatieQuery::fromValue($value);
 
                 // does the model contain this specific type
-                if( is_callable([$request, strtolower($type)]) && 
-                    is_callable([$model, "getQuery" . ucfirst(strtolower($type))]) &&
-                    is_callable([$model, "getAuthorizedQuery" . ucfirst(strtolower($type))])
+                if( is_callable([$request, strtolower($value)]) && 
+                    is_callable([$model, AuthorizedQuery::getQueryMethodForSpatie($type)]) &&
+                    is_callable([$model, AuthorizedQuery::getAuthorizedQueryMethodForSpatie($type)])
                 )
                 {
-                    static::checkQueryAuthorizationFromParams(
+                    static::checkQueryAuthorization(
                         $type,
-                        $request->{strtolower($type)}(),
-                        $model->{"getQuery" . ucfirst(strtolower($type))}(),
-                        $model->{"getAuthorizedQuery" . ucfirst(strtolower($type))}()
+                        $request->{strtolower($value)}(),
+                        $model->{AuthorizedQuery::getQueryMethodForSpatie($type)}(),
+                        $model->{AuthorizedQuery::getAuthorizedQueryMethodForSpatie($type)}()
                     );
                 }
             }
@@ -79,18 +83,18 @@ trait AuthorizesUserActionsOnModelsTrait
 
     /**
      * Check if query params contain any accessible elements but for which the user lacks authorization.
-     * TODO: this is a bit dirty
      * 
+     * @param SpatieQuery $type
      * @param Collection $params
      * @param array $accessible
      * @param array $authorized
      * 
      * @throws AccessDeniedHttpException
      */
-    public static function checkQueryAuthorizationFromParams($type, Collection $params, array $accessible, array $authorized)
+    public static function checkQueryAuthorization(SpatieQuery $type, Collection $params, array $accessible, array $authorized)
     {
         // Find all requested unauthorized params
-        if($type === "filters") {
+        if($type->is(SpatieQuery::Filter)) {
             // map filter collections as they are not all strings
             $remap = function ($filter) {
                 if ($filter instanceof AllowedFilter) {
@@ -99,13 +103,14 @@ trait AuthorizesUserActionsOnModelsTrait
                 return $filter;
             };
 
+            // filter out from collection
             $params = $params
                         ->map($remap)
                         ->intersect(collect($accessible)->map($remap))
                         ->diff(collect($authorized)->map($remap));
         } else {
-            // otherwise, if the collections are only strings, use them
-            $params = $params->intersect($accessible)->diff($authorized);
+            // otherwise, if only strings in collection, use them
+            $params = $params->flatten()->intersect($accessible)->diff($authorized);
         }
 
         // Check if any unauthorized params requested
