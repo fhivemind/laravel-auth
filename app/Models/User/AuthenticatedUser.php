@@ -13,17 +13,17 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
+use Illuminate\Contracts\Auth\MustVerifyEmail as MustVerifyEmailContract;
+use Illuminate\Auth\MustVerifyEmail;
 
 class AuthenticatedUser extends User implements
     AuthenticatableContract,
     AuthorizableContract,
     CanResetPasswordContract,
-    MustVerifyEmail,
+    MustVerifyEmailContract,
     JWTSubject
 {
-    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmailTrait, Notifiable;
+    use Authenticatable, Authorizable, CanResetPassword, MustVerifyEmail, Notifiable;
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -60,11 +60,31 @@ class AuthenticatedUser extends User implements
         return $this->getKeyName();
     }
 
+    /**
+     * Mark the given user's email as verified.
+     *
+     * @return bool
+     */
+    public function markEmailAsVerified()
+    {
+        return $this->email_verified_at = $this->freshTimestamp();
+    }
+
+    /**
+     * Send password reset mail to user.
+     *
+     * @return bool
+     */
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new ResetPassword($token));
     }
 
+    /**
+     * Send verification mail to user.
+     *
+     * @return bool
+     */
     public function sendEmailVerificationNotification()
     {
         $this->notify(new VerifyEmail());

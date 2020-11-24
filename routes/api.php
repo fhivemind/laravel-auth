@@ -42,6 +42,10 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api)
         // Password reset
         $api->post('/password/email', 'App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
         $api->post('/password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.reset');
+
+        // Email verification
+        $api->get('/email/verify/{id}/{hash}', '\App\Http\Controllers\Auth\VerificationController@verify')->name('verification.verify');
+        $api->post('/email/resend', '\App\Http\Controllers\Auth\VerificationController@resend')->name('verification.resend');
     });
 
     /*
@@ -60,10 +64,6 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api)
 
             // Token
             $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh')->name('token.refresh');
-
-            // Email verification
-            $api->get('/email/verify/{id}/{hash}', 'App\Http\Controllers\Auth\VerificationController@verify')->name('verification.verify');
-            $api->post('/email/resend', 'App\Http\Controllers\Auth\VerificationController@resend')->name('verification.resend');
         });
 
         /*
