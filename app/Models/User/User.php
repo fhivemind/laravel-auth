@@ -14,7 +14,7 @@ class User extends BaseModel
     protected $table = 'user';
 
     /**
-     * List of eager loading relationships that model supports
+     * List of eager loading relations that model supports
      * 
      * @var array
      */
@@ -111,7 +111,7 @@ class User extends BaseModel
     }
 
     /**
-     * Return list of relationships for which the eager loading is supported.
+     * Return list of relations for which the eager loading is supported.
      *
      * @return array
      */

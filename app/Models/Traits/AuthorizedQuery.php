@@ -27,23 +27,10 @@ trait AuthorizedQuery
     public static $APPEND_POLICY_PREFIX  = "append";
 
     /**
-     * List of query method identifiers. This should never be changed!
-     * 
-     * Naming: %s_METHOD
-     * 
-     */
-    protected static $WITH_METHOD    = "with";
-    protected static $FIELD_METHOD   = "fields";
-    protected static $FILTER_METHOD  = "filters";
-    protected static $SORT_METHOD    = "sorts";
-    protected static $INCLUDE_METHOD = "includes";
-    protected static $APPEND_METHOD  = "appends";
-
-    /**
-     * List of supported relationships that the entity can be returned with.
+     * List of supported relations that the entity can be returned with.
      * 
      * Its counterpart `getAuthorizedQueryWith()` validates which of these 
-     * relationships are visible for the current user.
+     * relations are visible for the current user.
      *
      * @return array
      */
@@ -94,7 +81,7 @@ trait AuthorizedQuery
     }
 
     /**
-     * List of relations for which relationship (eager) loading is supported through queries.
+     * List of relations for which relation (eager) loading is supported through queries.
      * 
      * Its counterpart `getAuthorizedQueryIncludes()` validates which of these 
      * attributes are visible for the current user.
@@ -130,6 +117,20 @@ trait AuthorizedQuery
      * TODO: note that DOT notation is used to differ from 
      * TODO: model and relation requests
      ***********************************************************/
+    /**
+     * List of query method identifiers. This should never be changed!
+     * It defines suffix of all `getQuery` and `getAuthorizedQuery`.
+     * 
+     * Naming: %s_METHOD
+     * 
+     */
+    protected static $WITH_METHOD    = "with";
+    protected static $FIELD_METHOD   = "fields";
+    protected static $FILTER_METHOD  = "filters";
+    protected static $SORT_METHOD    = "sorts";
+    protected static $INCLUDE_METHOD = "includes";
+    protected static $APPEND_METHOD  = "appends";
+
     /**
      * Get list of attributes for which the sorting is allowed for current user.
      * 
@@ -180,7 +181,7 @@ trait AuthorizedQuery
     }
 
     /**
-     * Get list of relationships for which eager loading through queries is allowed for current user.
+     * Get list of relations for which eager loading through queries is allowed for current user.
      *
      * @return array
      */
@@ -206,7 +207,7 @@ trait AuthorizedQuery
     }
 
     /**
-     * Get list of eager loading relationships which are allowed for current user.
+     * Get list of eager loading relations which are allowed for current user.
      * 
      * TODO: Drop relations when user specifically requesting via fields, e.g. /user?fields[user]=id,name
      * 
@@ -290,9 +291,9 @@ trait AuthorizedQuery
      * Optimization data.
      * 
      * @var array
-     * @var bool array[TYPE][0] - reload authorization data, if set to true, it will force 
+     * @var bool array[TYPE]->update - reload authorization data, if set to true, it will force 
      * `getAuthorizedQueryTYPE` to reload authorized fields from policy
-     * @var bool array[TYPE][1] - authorized fields
+     * @var bool array[TYPE]->data - authorized fields
      * 
      * @return array
      */

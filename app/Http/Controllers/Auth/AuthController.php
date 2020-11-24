@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Features\JWTAuthenticationTrait;
 use App\Models\AuthenticatedUser;
 use App\Models\UserStatus;
 use Dingo\Api\Exception\ResourceException;
@@ -15,6 +16,8 @@ use Hash;
 
 class AuthController extends Controller
 {
+    use JWTAuthenticationTrait;
+    
     public static function repository() {
         return null;
     }

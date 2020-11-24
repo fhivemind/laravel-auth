@@ -143,10 +143,10 @@ class RestfulModel extends Model
      ***********************************************************/
 
      /**
-     * List of supported relationships that the entity can be returned with.
+     * List of supported relations that the entity can be returned with.
      * 
      * Its counterpart `getAuthorizedWith()` validates which of these 
-     * relationships are visible for the current user.
+     * relations are visible for the current user.
      *
      * @return array
      */
@@ -197,7 +197,7 @@ class RestfulModel extends Model
     }
 
     /**
-     * List of relations for which relationship (eager) loading is supported through queries.
+     * List of relations for which relation (eager) loading is supported through queries.
      * 
      * Its counterpart `getAuthorizedQueryIncludes()` validates which of these 
      * attributes are visible for the current user.

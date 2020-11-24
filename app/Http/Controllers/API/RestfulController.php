@@ -10,6 +10,7 @@ use Spatie\QueryBuilder\QueryBuilderRequest;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Cache;
+use Illuminate\Database\Eloquent\Model;
 
 abstract class RestfulController extends BaseRestfulController
 {
@@ -256,11 +257,12 @@ abstract class RestfulController extends BaseRestfulController
      * @param Request $request
      * @param Model $model
      * @param array $search
+     * @param array $relations
      * 
      * @throws Exception
      * @return QueryBuilder
      */
-    public static function newQueryFromRequest(Request $request, $model, $search = [], $relations = [])
+    public static function newQueryFromRequest(Request $request, Model $model, $search = [], $relations = [])
     {
         // Handle RestfulModel logic
         if ($model instanceof RestfulModel) {

@@ -113,7 +113,7 @@ abstract class RestfulChildController extends BaseRestfulController
     }
 
     /**
-     * Request to retrieve a single child owned by the parent of this resource (hasOne relationship)
+     * Request to retrieve a single child owned by the parent of this resource (hasOne relation)
      *
      * @param string $id
      * @param Request $request
