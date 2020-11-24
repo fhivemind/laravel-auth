@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\OAuthProvider;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,9 @@ class RouteServiceProvider extends ServiceProvider
 
         // UUID Pattern
         Route::pattern('uuid', '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}');
+
+        // OAuth providers
+        Route::pattern('provider', '^('. join("|", OAuthProvider::getValues()) .')');
 
         parent::boot();
     }

@@ -34,6 +34,12 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         // TODO: Implement endpoints
         // $api->post('/reset/{mail}', 'App\Http\Controllers\Auth\AuthController@reset');
         // $api->post('/verify/{verification_code}', 'App\Http\Controllers\Auth\AuthController@verify');
+        // $api->post('/resent/{mail}', 'App\Http\Controllers\Auth\AuthController@resend');
+    });
+
+    $api->group(['prefix' => 'oauth'], function (Router $api) {
+        $api->get('/{provider}', 'App\Http\Controllers\Auth\AuthController@redirectToProvider');
+        $api->post('/callback/{provider}', 'App\Http\Controllers\Auth\AuthController@handleProviderCallback');
     });
 
     /*
@@ -44,12 +50,9 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
          * Authentication
          */
         $api->group(['prefix' => 'auth'], function (Router $api) {
-            $api->group(['prefix' => 'token'], function (Router $api) {
-                $api->get('/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
-            });
-
-            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
             $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser');
+            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
+            $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
         });
 
         /*

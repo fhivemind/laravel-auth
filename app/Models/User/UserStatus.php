@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\UserStatus as EnumsUserStatus;
+use App\Models\Enums\UserStatus as EnumsUserStatus;
 
 class UserStatus extends BaseModel
 {

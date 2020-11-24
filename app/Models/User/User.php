@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Role;
 use Hash;
-use App\Enums\UserStatus as Status;
+use App\Models\Enums\UserStatus as Status;
 
 class User extends BaseModel
 {    
