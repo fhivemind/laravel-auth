@@ -17,48 +17,60 @@ use Dingo\Api\Routing\Router;
  * Welcome route
  * TODO: Replace this with the complete list of APIs
  */
-Route::get('/', function () {
+Route::get('/', function () 
+{
     echo 'Jourfixer API';
 });
 
 /** @var \Dingo\Api\Routing\Router $api */
 $api = app('Dingo\Api\Routing\Router');
-$api->version('v1', ['middleware' => ['api']], function (Router $api) {
+$api->version('v1', ['middleware' => ['api']], function (Router $api)
+{
     /*
      * Authentication
      */
-    $api->group(['prefix' => 'auth'], function (Router $api) {
-        $api->get('/login', 'App\Http\Controllers\Auth\AuthController@token');
-        $api->post('/register', 'App\Http\Controllers\Auth\AuthController@register');
+    $api->group(['prefix' => 'auth'], function (Router $api)
+    {
+        // Auth
+        $api->get ('/login', 'App\Http\Controllers\Auth\AuthController@token')->name('login');
+        $api->post('/register', 'App\Http\Controllers\Auth\AuthController@register')->name('register');
 
-        // TODO: Implement endpoints
-        // $api->post('/reset/{mail}', 'App\Http\Controllers\Auth\AuthController@reset');
-        // $api->post('/verify/{verification_code}', 'App\Http\Controllers\Auth\AuthController@verify');
-        // $api->post('/resent/{mail}', 'App\Http\Controllers\Auth\AuthController@resend');
-    });
+        // OAuth
+        $api->get('/oauth/{provider}', 'App\Http\Controllers\Auth\AuthController@redirectToProvider')->name('oauth.redirect');
+        $api->post('/oauth/callback/{provider}', 'App\Http\Controllers\Auth\AuthController@handleProviderCallback')->name('oauth.callback');
 
-    $api->group(['prefix' => 'oauth'], function (Router $api) {
-        $api->get('/{provider}', 'App\Http\Controllers\Auth\AuthController@redirectToProvider');
-        $api->post('/callback/{provider}', 'App\Http\Controllers\Auth\AuthController@handleProviderCallback');
+        // Password reset
+        $api->post('/password/email', 'App\Http\Controllers\Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+        $api->post('/password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.reset');
     });
 
     /*
      * Authenticated routes
      */
-    $api->group(['middleware' => ['api.auth']], function (Router $api) {
+    $api->group(['middleware' => ['api.auth']], function (Router $api)
+    {
         /*
          * Authentication
          */
-        $api->group(['prefix' => 'auth'], function (Router $api) {
-            $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser');
-            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout');
-            $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh');
+        $api->group(['prefix' => 'auth'], function (Router $api) 
+        {
+            // User
+            $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser')->name('me');
+            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout')->name('logout');
+
+            // Token
+            $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh')->name('token.refresh');
+
+            // Email verification
+            $api->get('/email/verify/{id}/{hash}', 'App\Http\Controllers\Auth\VerificationController@verify')->name('verification.verify');
+            $api->post('/email/resend', 'App\Http\Controllers\Auth\VerificationController@resend')->name('verification.resend');
         });
 
         /*
          * Users
          */
-        $api->group(['prefix' => 'user'], function (Router $api) {
+        $api->group(['prefix' => 'user'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\UserController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\UserController@get');
             $api->post('/', 'App\Http\Controllers\UserController@post');
@@ -70,7 +82,8 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * Status
          */
-        $api->group(['prefix' => 'user_status'], function (Router $api) {
+        $api->group(['prefix' => 'user_status'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\UserStatusController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\UserStatusController@get');
         });
@@ -78,7 +91,8 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * Roles
          */
-        $api->group(['prefix' => 'role'], function (Router $api) {
+        $api->group(['prefix' => 'role'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\RoleController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\RoleController@get');
         });
@@ -86,7 +100,8 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Roles
          */
-        $api->group(['prefix' => 'user_role'], function (Router $api) {
+        $api->group(['prefix' => 'user_role'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\UserRoleController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\UserRoleController@get');
             $api->post('/', 'App\Http\Controllers\UserRoleController@post');
@@ -98,7 +113,8 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Logs
          */
-        $api->group(['prefix' => 'user_log'], function (Router $api) {
+        $api->group(['prefix' => 'user_log'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\UserLogsController@getAll');
             $api->get('/{uuid}', 'App\Http\Controllers\UserLogsController@get');
         });
@@ -106,7 +122,8 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api) {
         /*
          * User Referrals
          */
-        $api->group(['prefix' => 'referral'], function (Router $api) {
+        $api->group(['prefix' => 'referral'], function (Router $api) 
+        {
             $api->get('/', 'App\Http\Controllers\ReferralController@getAll');
             $api->get('/{id}', 'App\Http\Controllers\ReferralController@get');
         });

@@ -14,15 +14,11 @@ use App\Models\UserStatus;
 use Dingo\Api\Exception\ResourceException;
 use Dingo\Api\Http\Response;
 use Hash;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
-    use JWTAuthenticationTrait;
-    use OAuthAuthenticationTrait;
-    
-    public static function repository() {
-        return null;
-    }
+    use JWTAuthenticationTrait, OAuthAuthenticationTrait;
 
     /**
      * Creates a new user from request.
@@ -57,6 +53,9 @@ class AuthController extends Controller
         // do login
         $user = AuthenticatedUser::find($user->id);
         $token = auth()->login($user);
+
+        // notify
+        event(new Registered($user));
 
         // send token
         return $this->respondWithToken($token);

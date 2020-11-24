@@ -120,19 +120,7 @@
         "inView": true
     },
     {
-        "name": "verification_code",
-        "dbType": "string:nullable",
-        "htmlType": "text",
-        "validations": "nullable|string|nullable|string",
-        "searchable": true,
-        "fillable": true,
-        "primary": false,
-        "inForm": true,
-        "inIndex": true,
-        "inView": true
-    },
-    {
-        "name": "verified_at",
+        "name": "email_verified_at",
         "dbType": "datetime:nullable",
         "htmlType": "date",
         "validations": "nullable|nullable",

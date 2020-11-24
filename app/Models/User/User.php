@@ -34,7 +34,7 @@ class User extends BaseModel
         'email',
         'phone_number', // requires authorization policy
         'comment',
-        'verified_at',
+        'email_verified_at',
         'id_country',
         'id_status'     // requires authorization policy
     ];
@@ -45,7 +45,7 @@ class User extends BaseModel
      * @var array
      */
     public $immutable = [
-        'verified_at',
+        'email_verified_at',
         'updated_at',
         'created_at'
     ];
@@ -58,8 +58,7 @@ class User extends BaseModel
     protected $hidden = [
         'password',
         'token',
-        'token_expires_at',
-        'verification_code'
+        'token_expires_at'
     ];
 
     /**
@@ -78,8 +77,7 @@ class User extends BaseModel
         'token' => 'string',
         'token_expires_at' => 'datetime',
         'comment' => 'string',
-        'verification_code' => 'string',
-        'verified_at' => 'datetime',
+        'email_verified_at' => 'datetime',
         'id_country' => 'integer',
         'id_status' => 'integer'
     ];
@@ -101,8 +99,7 @@ class User extends BaseModel
             'token' => 'nullable|string',
             'token_expires_at' => 'nullable',
             'comment' => 'nullable|string',
-            'verification_code' => 'nullable|string',
-            'verified_at' => 'nullable',
+            'email_verified_at' => 'nullable',
             'created_at' => 'nullable',
             'updated_at' => 'nullable',
             'id_country' => 'nullable|integer',

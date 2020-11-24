@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Features;
 use App\Enums\OAuthProvider;
 use Illuminate\Http\Request;
 use Dingo\Api\Http\Response;
-use App\Exceptions\UnauthorizedHttpException;
 use App\Models\AuthenticatedUser;
 use App\Models\Enums\UserStatus as EnumsUserStatus;
 use App\Models\User;
 use App\Models\UserStatus;
 use Dingo\Api\Exception\ResourceException;
+use Illuminate\Auth\Events\Registered;
 use Laravel\Socialite\Facades\Socialite;
 
 trait OAuthAuthenticationTrait
@@ -49,7 +49,7 @@ trait OAuthAuthenticationTrait
         $providerUser = Socialite::driver($provider)->stateless()->user();
 
         // Find authenticated user
-        $user = User::query()->firstOrNew(['email' => $providerUser->getEmail()]);
+        $user = AuthenticatedUser::query()->firstOrNew(['email' => $providerUser->getEmail()]);
 
         // If not registered, create user account
         if (! $user->exists) 
@@ -60,10 +60,12 @@ trait OAuthAuthenticationTrait
 
             // validate and save
             $user = $this->restfulService->persistResource($user);
+
+            // notify
+            event(new Registered($user));
         }
 
         // do login
-        $user = AuthenticatedUser::find($user->id);
         $token = auth()->login($user);
 
         // send token

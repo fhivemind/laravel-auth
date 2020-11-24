@@ -40,7 +40,14 @@ use Illuminate\Foundation\Validation\ValidatesRequests;
  * 
  * 
  */
-abstract class Controller extends RestfulController
+class Controller extends RestfulController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
+
+    /**
+     * Disable repository pattern for base controller.
+     */
+    public static function repository() {
+        return null;
+    }
 }
