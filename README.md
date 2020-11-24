@@ -106,3 +106,48 @@ Now, when requesting default endpoint at `/user/1` response will be given as:
 ```
 
 Authorization policies are also enabled, which will hide these fields in case of insufficient permissions. Example usage include providing user logs for owner account.
+
+## Routes
+
+Complete list of supported API is given in table below. Click to view fully expanded table.
+<details><summary>Click to view</summary>
+<p>
+
+#### Routes list
+
+ Method   | URI                                | Action                                      | Protected 
+----------|------------------------------------|---------------------------------------------|-----------
+ GET,HEAD | api/auth/login                     | AuthController@token                        | No        
+ POST     | api/auth/register                  | AuthController@register                     | No        
+ GET,HEAD | api/auth/oauth/{provider}          | AuthController@redirectToProvider           | No        
+ POST     | api/auth/oauth/callback/{provider} | AuthController@handleProviderCallback       | No        
+ POST     | api/auth/password/email            | ForgotPasswordController@sendResetLinkEmail | No        
+ POST     | api/auth/password/reset            | ResetPasswordController@reset               | No        
+ GET,HEAD | api/auth/email/verify/{id}/{hash}  | VerificationController@verify               | No        
+ POST     | api/auth/email/resend              | VerificationController@resend               | No        
+ GET,HEAD | api/auth/me                        | AuthController@getUser                      | Yes       
+ DELETE   | api/auth/logout                    | AuthController@logout                       | Yes       
+ GET,HEAD | api/auth/token/refresh             | AuthController@refresh                      | Yes       
+ GET,HEAD | api/user                           | UserController@getAll                       | Yes       
+ GET,HEAD | api/user/{id}                      | UserController@get                          | Yes       
+ POST     | api/user                           | UserController@post                         | Yes       
+ PUT      | api/user/{id}                      | UserController@put                          | Yes       
+ PATCH    | api/user/{id}                      | UserController@patch                        | Yes       
+ DELETE   | api/user/{id}                      | UserController@delete                       | Yes       
+ GET,HEAD | api/user_status                    | UserStatusController@getAll                 | Yes       
+ GET,HEAD | api/user_status/{id}               | UserStatusController@get                    | Yes       
+ GET,HEAD | api/role                           | RoleController@getAll                       | Yes       
+ GET,HEAD | api/role/{id}                      | RoleController@get                          | Yes       
+ GET,HEAD | api/user_role                      | UserRoleController@getAll                   | Yes       
+ GET,HEAD | api/user_role/{id}                 | UserRoleController@get                      | Yes       
+ POST     | api/user_role                      | UserRoleController@post                     | Yes       
+ PUT      | api/user_role/{id}                 | UserRoleController@put                      | Yes       
+ PATCH    | api/user_role/{id}                 | UserRoleController@patch                    | Yes       
+ DELETE   | api/user_role/{id}                 | UserRoleController@delete                   | Yes       
+ GET,HEAD | api/user_log                       | UserLogsController@getAll                   | Yes       
+ GET,HEAD | api/user_log/{uuid}                | UserLogsController@get                      | Yes       
+ GET,HEAD | api/referral                       | ReferralController@getAll                   | Yes       
+ GET,HEAD | api/referral/{id}                  | ReferralController@get                      | Yes       
+
+</p>
+</details>

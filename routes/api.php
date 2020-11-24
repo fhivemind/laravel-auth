@@ -26,8 +26,19 @@ Route::get('/', function ()
 $api = app('Dingo\Api\Routing\Router');
 $api->version('v1', ['middleware' => ['api']], function (Router $api)
 {
+    /**
+     * Health checks
+     * 
+     * TODO: This is low priority, can be implemented last.
+     *  $api->get('/healthz', 'App\Http\Controllers\Server@healthy');
+     *  $api->get('/readyz', 'App\Http\Controllers\Server@ready');
+     *  $api->get('/livez', 'App\Http\Controllers\Server@live');
+     */
+
     /*
-     * Authentication
+     * User control
+     * 
+     * [o] Publicly exposed
      */
     $api->group(['prefix' => 'auth'], function (Router $api)
     {
@@ -44,28 +55,33 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api)
         $api->post('/password/reset', 'App\Http\Controllers\Auth\ResetPasswordController@reset')->name('password.reset');
 
         // Email verification
-        $api->get('/email/verify/{id}/{hash}', '\App\Http\Controllers\Auth\VerificationController@verify')->name('verification.verify');
-        $api->post('/email/resend', '\App\Http\Controllers\Auth\VerificationController@resend')->name('verification.resend');
+        $api->get('/email/verify/{id}/{hash}', 'App\Http\Controllers\Auth\VerificationController@verify')->name('verification.verify');
+        $api->post('/email/resend', 'App\Http\Controllers\Auth\VerificationController@resend')->name('verification.resend');
     });
 
     /*
-     * Authenticated routes
+     * User control
+     * 
+     * [x] Protected by JWT
      */
-    $api->group(['middleware' => ['api.auth']], function (Router $api)
+    $api->group(['prefix' => 'auth', 'middleware' => ['api.auth']], function (Router $api)
     {
-        /*
-         * Authentication
-         */
-        $api->group(['prefix' => 'auth'], function (Router $api) 
-        {
-            // User
-            $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser')->name('me');
-            $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout')->name('logout');
+        // User
+        $api->get('/me', 'App\Http\Controllers\Auth\AuthController@getUser')->name('me');
+        $api->delete('/logout', 'App\Http\Controllers\Auth\AuthController@logout')->name('logout');
 
-            // Token
-            $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh')->name('token.refresh');
-        });
+        // Token
+        $api->get('/token/refresh', 'App\Http\Controllers\Auth\AuthController@refresh')->name('token.refresh');
+    });
 
+    /*
+     * API Routes
+     * 
+     * [x] Protected by JWT
+     * [x] Only verified users
+     */
+    $api->group(['middleware' => ['api.auth', 'verified']], function (Router $api)
+    {
         /*
          * Users
          */
