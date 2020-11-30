@@ -43,7 +43,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api)
     $api->group(['prefix' => 'auth'], function (Router $api)
     {
         // Auth
-        $api->get ('/login', 'App\Http\Controllers\Auth\AuthController@token')->name('login');
+        $api->post('/login', 'App\Http\Controllers\Auth\AuthController@token')->name('login');
         $api->post('/register', 'App\Http\Controllers\Auth\AuthController@register')->name('register');
 
         // OAuth
