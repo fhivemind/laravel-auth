@@ -24,6 +24,7 @@ Route::get('/', function ()
 
 /** @var \Dingo\Api\Routing\Router $api */
 $api = app('Dingo\Api\Routing\Router');
+
 $api->version('v1', ['middleware' => ['api']], function (Router $api)
 {
     /**

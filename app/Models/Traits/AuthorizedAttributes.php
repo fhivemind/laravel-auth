@@ -60,10 +60,10 @@ trait AuthorizedAttributes
      *
      * @return array
      */
-    public function getFillable()
-    {
-        return $this->getAuthorizedEditableAttributes();
-    }
+    // public function getFillable()
+    // {
+    //     return $this->getAuthorizedEditableAttributes();
+    // }
 
     /**
      * Get all fillable attributes that current user can edit.
