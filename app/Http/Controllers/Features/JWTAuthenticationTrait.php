@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Features;
 use Illuminate\Http\Request;
 use Dingo\Api\Http\Response;
 use App\Exceptions\UnauthorizedHttpException;
+use App\Models\AuthenticatedUser;
+use Dingo\Api\Exception\ResourceException;
 
 trait JWTAuthenticationTrait
 {
@@ -27,6 +29,12 @@ trait JWTAuthenticationTrait
         $credentials = base64_decode(trim(substr($authHeader, 5)));
 
         [$email, $password] = explode(':', $credentials, 2);
+
+        // validate request
+        // Find authenticated user
+        if (! AuthenticatedUser::query()->where('email', $email)->first() ) {
+            throw new ResourceException("Invalid login data.", ["email" => "User with provided email does not exist."]);;
+        }
 
         // Do auth
         if (! $token = auth()->attempt(['email' => $email, 'password' => $password])) {

@@ -11,6 +11,20 @@ class ResetPasswordController extends Controller
 {
     use ResetsPasswords;
 
+    /**
+     * Get the password reset validation rules.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return [
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:6',
+        ];
+    }
+
     protected function sendResetResponse(Request $request, $response)
     {
         $response = ['message' => "Password reset successful"];
