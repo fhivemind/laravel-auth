@@ -31,7 +31,7 @@ trait OAuthAuthenticationTrait
         }
 
         $redirect = Socialite::driver($provider)->stateless()->redirect();
-        return $redirect;
+        return $redirect->getTargetUrl();
     }
 
     /**
