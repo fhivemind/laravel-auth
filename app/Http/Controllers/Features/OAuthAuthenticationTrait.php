@@ -35,6 +35,25 @@ trait OAuthAuthenticationTrait
     }
 
     /**
+     * Returns a map of all allowed OAuth providers.
+     * 
+     * @return Response
+     */
+    public function fetchProviders(Request $request)
+    {
+        $result = array();
+        foreach (OAuthProvider::getValues() as $provider) {
+            $result[$provider] = Socialite::driver($provider)
+                                                ->stateless()
+                                                ->redirect()
+                                                ->getTargetUrl();
+        }
+
+        return $this->response->array($result, $this->getTransformer());
+    }
+
+
+    /**
      * Obtain the user information from OAuth provider.
      *
      * @var string $provider

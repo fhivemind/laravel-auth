@@ -48,6 +48,7 @@ $api->version('v1', ['middleware' => ['api']], function (Router $api)
         $api->post('/register', 'App\Http\Controllers\Auth\AuthController@register')->name('register');
 
         // OAuth
+        $api->get('/oauth', 'App\Http\Controllers\Auth\AuthController@fetchProviders')->name('oauth.providers');
         $api->get('/oauth/{provider}', 'App\Http\Controllers\Auth\AuthController@redirectToProvider')->name('oauth.redirect');
         $api->post('/oauth/callback/{provider}', 'App\Http\Controllers\Auth\AuthController@handleProviderCallback')->name('oauth.callback');
 
