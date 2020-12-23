@@ -58,7 +58,8 @@ class User extends BaseModel
     protected $hidden = [
         'password',
         'token',
-        'token_expires_at'
+        'token_expires_at',
+        'email_verified_at'
     ];
 
     /**

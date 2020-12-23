@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Dingo\Api\Http\Response;
 use App\Exceptions\UnauthorizedHttpException;
 use App\Models\AuthenticatedUser;
+use App\Models\User;
 use Dingo\Api\Exception\ResourceException;
 
 trait JWTAuthenticationTrait
@@ -77,7 +78,7 @@ trait JWTAuthenticationTrait
     }
 
     /**
-     * Get the token array structure.
+     * Respond with authorized data.
      *
      * @param string $token
      * @return Response
@@ -86,9 +87,11 @@ trait JWTAuthenticationTrait
     {
         $tokenReponse = new \Stdclass;
 
-        $tokenReponse->jwt = $token;
-        $tokenReponse->token_type = 'bearer';
-        $tokenReponse->expires_in = auth()->factory()->getTTL();
+        $tokenReponse->user = auth()->user();
+        $tokenReponse->token = new \Stdclass;
+        $tokenReponse->token->jwt = $token;
+        $tokenReponse->token->token_type = 'bearer';
+        $tokenReponse->token->expires_in = auth()->factory()->getTTL();
 
         return $this->response->item($tokenReponse, $this->getTransformer())->setStatusCode(200);
     }
