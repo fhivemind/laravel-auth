@@ -19,7 +19,7 @@ use Dingo\Api\Routing\Router;
  */
 Route::get('/', function () 
 {
-    echo 'Jourfixer API';
+    echo 'LaravelAuth API';
 });
 
 /** @var \Dingo\Api\Routing\Router $api */

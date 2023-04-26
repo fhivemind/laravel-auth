@@ -4,7 +4,7 @@ services:
 
 # Workspace Container
     workspace:
-      container_name: jourfixer_workspace
+      container_name: laravelauth_workspace
       build:
         context: ./env/docker/workspace
         args:
@@ -21,11 +21,11 @@ services:
         - ~/.aws:/home/laradock/.aws
       tty: true
       networks:
-        - jourfixer_network
+        - laravelauth_network
 
 # PHP-FPM
     php-fpm:
-      container_name: jourfixer_php_fpm
+      container_name: laravelauth_php_fpm
       build:
         context: ./env/docker/php-fpm
         args:
@@ -38,11 +38,11 @@ services:
       depends_on:
         - workspace
       networks:
-        - jourfixer_network
+        - laravelauth_network
 
 # NGINX
     nginx:
-      container_name: jourfixer_nginx
+      container_name: laravelauth_nginx
       build:
         context: ./env/docker/nginx
       volumes:
@@ -56,11 +56,11 @@ services:
       ports:
         - 80:80
       networks:
-        - jourfixer_network
+        - laravelauth_network
 
 # PostgreSQL
     postgres:
-      container_name: jourfixer_postgres
+      container_name: laravelauth_postgres
       build:
         context: ./env/docker/postgres
       volumes:
@@ -70,15 +70,15 @@ services:
         - POSTGRES_USER=${POSTGRES_USER}
         - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
       networks:
-        - jourfixer_network
+        - laravelauth_network
 
 # Redis
     redis:
-      container_name: jourfixer_redis
+      container_name: laravelauth_redis
       image: "redis"
-      hostname: jourfixer_redis
+      hostname: laravelauth_redis
       networks:
-        - jourfixer_network
+        - laravelauth_network
 
 # Volumes configuration
 volumes:
@@ -87,5 +87,5 @@ volumes:
 
 # Network configuration
 networks:
-  jourfixer_network:
-    name: jourfixer_network
+  laravelauth_network:
+    name: laravelauth_network

@@ -1,20 +1,29 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+# Laravel Auth Boilerplate
 
-> This serves as **backend API** for Jourfixer project. 
-It will also have a dedicated entrypoint for Admin panel based on [core-ui](https://coreui.io/) admin template.
+A boilerplate for Laravel projects based on [github.com/laravel-api-boilerplate](https://github.com/specialtactics/laravel-api-boilerplate) 
+with a focus on advanced authentication, authorization, and API policies.
+Contains a dedicated entrypoint for Admin panel based on [core-ui](https://coreui.io/) admin template.
 
-### Laravel API Boilerplate
-Find the boilerplate used for this project at [github.com/laravel-api-boilerplate](https://github.com/specialtactics/laravel-api-boilerplate).
+## Installation
+You can quickly get the environment up and running by running
+```bash
+./env/build.sh
 
-This has been heavily extend and upgraded.
+```
 
----
+You can also use native docker support which quickly boots up the environment by running
+```
+docker-compose up
+```
+
+Notes:
+Make sure to create an `.env` file from `.env.example` to change runtime configuration
 
 ## API
 
 To select appropriate version of API, following header must be provided (`v1` defines the endpoint version):
 ```bash
-Accept: application/vnd.jourfixer.v1+json
+Accept: application/vnd.laravelauth.v1+json
 ```
 Currently supported versions: `v1`
 

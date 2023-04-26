@@ -1,6 +1,6 @@
 {
-    "name": "jourfixer/api",
-    "description": "Backend for Jourfixer APP",
+    "name": "laravelauth/api",
+    "description": "Backend for LaravelAuth APP",
     "keywords": [
         "laravel",
         "api"
@@ -10,7 +10,7 @@
     "authors": [
         {
             "name": "Ramiz Polic",
-            "email": "hivemindf@gmail.com"
+            "email": "ramiz.polic@hotmail.com"
         }
     ],
     "require": {
