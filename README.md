@@ -5,13 +5,13 @@ with a focus on advanced authentication, authorization, and API policies.
 Contains a dedicated entrypoint for Admin panel based on [core-ui](https://coreui.io/) admin template.
 
 ## Installation
-You can quickly get the environment up and running by running
+You can quickly get the environment up and running by
 ```bash
 ./env/build.sh
 
 ```
 
-You can also use native docker support which quickly boots up the environment by running
+You can also use native docker support which quickly boots up the environment via
 ```
 docker-compose up
 ```
